@@ -1,0 +1,156 @@
+/* a minimalist set of CSS resets */
+
+/* default to border-box */
+html {
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+/* adjust typography defaults */
+body {
+  margin: 1rem;
+  font-family: sans-serif;
+  line-height: 1.5;
+}
+
+/* images and videos max out at full width */
+img,
+video {
+  height: auto;
+  max-width: 100%;
+}
+
+ul {
+  list-style-type: none;
+  padding-left: 5px;
+}
+
+a {
+  text-decoration: none;
+}
+
+button:hover {
+  cursor: pointer;
+}
+.button:hover {
+  cursor: pointer;
+}
+
+label {
+  margin-right: 5px;
+}
+
+li.header {
+  font-weight: bold;
+}
+
+.row {
+  display: flex;
+}
+.row div {
+  margin: 2px;
+}
+
+.view {
+  padding: 4px;
+  border: 1px solid black;
+  border-radius: 3px;
+  margin: 2px;
+}
+.selected {
+  background-color: black;
+  color: white;
+}
+.view:hover {
+  cursor: pointer;
+}
+
+.login {
+  display: none;
+}
+
+.tower div {
+  padding: 2px;
+}
+
+.tower.unringable div {
+  color: gray;
+}
+
+#list, #towerdetail, #mylist, #visitdetail, #newvisit {
+  display: none;
+}
+
+#towerdetail, #visitdetail, #newvisit {
+  width: 95%;
+}
+
+#sortby div {
+  padding: 4px;
+  border: 1px solid black;
+  border-radius: 3px;
+  margin: 2px;
+}
+#sortby div:first-child {
+  border: none;
+}
+#sortby div:hover {
+  cursor: pointer;
+}
+
+#container {
+  display: flex;
+  width: 95%;
+}
+
+#nav {
+  left: 5px;
+  font-size: 10pt;
+  top: 0;
+}
+
+#table {
+  height: 530px;
+  overflow: scroll;
+}
+
+#alltowers {
+  margin-left: 20px;
+  
+}
+
+div.place {
+  padding-bottom: 0;
+}
+
+div.dedication {
+  font-size: 10pt;
+  padding-top: 0;
+}
+
+table.bells {
+  display: none;
+}
+
+#visits td {
+  padding-right: 10px;
+}
+
+#credit {
+  font-size: 10pt;
+}
+#credit p:first-child {
+  margin-top: 50px;
+  margin-bottom: 0;
+}
+#credit p:last-child {
+  margin-top: 0;
+}
+
+.delete {
+  color: red;
+}

@@ -46,7 +46,8 @@ fastify.get("/", function(request, reply) {
     email: "",
     years: [],
     days: [],
-    visits: []
+    visits: [],
+    uri: "https://"+process.env.URI
   };
   for (let i = 1; i <= 31; i++) {
     params.days.push(i);

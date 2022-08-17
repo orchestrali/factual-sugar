@@ -1,10 +1,12 @@
 dependencies:
+  encoding: 0.1.13
   fastify: 3.28.0
   fastify-formbody: 5.2.0
   fastify-static: 4.6.1
-  google-auth-library: 8.0.3
+  google-auth-library: 8.2.0
   handlebars: 4.7.7
   point-of-view: 5.2.0
+  rimraf: 3.0.2
 packages:
   /@fastify/ajv-compiler/1.1.0:
     dependencies:
@@ -12,14 +14,6 @@ packages:
     dev: false
     resolution:
       integrity: sha512-gvCOUNpXsWrIQ3A4aXCLIdblL0tDq42BG/2Xw7oxbil9h11uow10ztS2GuFazNBfjbrsZ5nl+nPl5jDSjj5TSg==
-  /abort-controller/3.0.0:
-    dependencies:
-      event-target-shim: 5.0.1
-    dev: false
-    engines:
-      node: '>=6.5'
-    resolution:
-      integrity: sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==
   /abstract-logging/2.0.1:
     dev: false
     resolution:
@@ -83,10 +77,10 @@ packages:
     dev: false
     resolution:
       integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==
-  /bignumber.js/9.0.2:
+  /bignumber.js/9.1.0:
     dev: false
     resolution:
-      integrity: sha512-GAcQvbpsM0pUb0zw1EI0KhQEZ+lRwR5fYaAp3vPOYuP7aDvGy6cVN6XHLauvF8SOga2y0dcLcjt3iQDTSEliyw==
+      integrity: sha512-4LwHK4nfDOraBCtst+wOWIHbu1vhvAPJK8g8nROd4iuc3PSEjWif/qwbkh8jwCJz6yDBvtU4KPynETgrfh7y3A==
   /brace-expansion/1.1.11:
     dependencies:
       balanced-match: 1.0.2
@@ -97,7 +91,7 @@ packages:
   /buffer-equal-constant-time/1.0.1:
     dev: false
     resolution:
-      integrity: sha1-+OcRMvf/5uAaXJaXpMbz5I1cyBk=
+      integrity: sha512-zRpUiDwd/xk6ADqPMATG8vc9VPrkck7T07OIx0gnjmJAnHnTVXNQG3vfvWNuiZIkwu9KrKdA1iJKfsfTVxE6NA==
   /concat-map/0.0.1:
     dev: false
     resolution:
@@ -168,6 +162,12 @@ packages:
       node: '>=10.13.0'
     resolution:
       integrity: sha512-GSK7qphNR4iPcejfAlZxKDoz3xMhnspwImK+Af5WhePS9jUpK/Oh7rUdyENWu+9rgDflOCTmAojBsgsvM8neAQ==
+  /encoding/0.1.13:
+    dependencies:
+      iconv-lite: 0.6.3
+    dev: false
+    resolution:
+      integrity: sha512-ETBauow1T35Y/WZMkio9jiM0Z5xjHHmJ4XmjZOq1l/dXz3lr2sRn87nJy20RupqSh1F2m3HHPSp8ShIPQJrJ3A==
   /escape-html/1.0.3:
     dev: false
     resolution:
@@ -178,12 +178,6 @@ packages:
       node: '>= 0.6'
     resolution:
       integrity: sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=
-  /event-target-shim/5.0.1:
-    dev: false
-    engines:
-      node: '>=6'
-    resolution:
-      integrity: sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==
   /extend/3.0.2:
     dev: false
     resolution:
@@ -312,21 +306,8 @@ packages:
     dev: false
     resolution:
       integrity: sha1-FQStJSMVjKpA20onh8sBQRmU6k8=
-  /gaxios/4.3.3:
+  /gaxios/5.0.1:
     dependencies:
-      abort-controller: 3.0.0
-      extend: 3.0.2
-      https-proxy-agent: 5.0.1
-      is-stream: 2.0.1
-      node-fetch: 2.6.7
-    dev: false
-    engines:
-      node: '>=10'
-    resolution:
-      integrity: sha512-gSaYYIO1Y3wUtdfHmjDUZ8LWaxJQpiavzbF5Kq53akSzvmVg0RfyOcFDbO1KJ/KCGRFz2qG+lS81F0nkr7cRJA==
-  /gaxios/5.0.0:
-    dependencies:
-      abort-controller: 3.0.0
       extend: 3.0.2
       https-proxy-agent: 5.0.1
       is-stream: 2.0.1
@@ -335,10 +316,10 @@ packages:
     engines:
       node: '>=12'
     resolution:
-      integrity: sha512-VD/yc5ln6XU8Ch1hyYY6kRMBE0Yc2np3fPyeJeYHhrPs1i8rgnsApPMWyrugkl7LLoSqpOJVBWlQIa87OAvt8Q==
+      integrity: sha512-keK47BGKHyyOVQxgcUaSaFvr3ehZYAlvhvpHXy0YB2itzZef+GqZR8TBsfVRWghdwlKrYsn+8L8i3eblF7Oviw==
   /gcp-metadata/5.0.0:
     dependencies:
-      gaxios: 5.0.0
+      gaxios: 5.0.1
       json-bigint: 1.0.0
     dev: false
     engines:
@@ -356,22 +337,33 @@ packages:
     dev: false
     resolution:
       integrity: sha512-lmLf6gtyrPq8tTjSmrO94wBeQbFR3HbLHbuyD69wuyQkImp2hWqMGB47OX65FBkPffO641IP9jWa1z4ivqG26Q==
-  /google-auth-library/8.0.3:
+  /glob/7.2.3:
+    dependencies:
+      fs.realpath: 1.0.0
+      inflight: 1.0.6
+      inherits: 2.0.4
+      minimatch: 3.1.2
+      once: 1.4.0
+      path-is-absolute: 1.0.1
+    dev: false
+    resolution:
+      integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==
+  /google-auth-library/8.2.0:
     dependencies:
       arrify: 2.0.1
       base64-js: 1.5.1
       ecdsa-sig-formatter: 1.0.11
       fast-text-encoding: 1.0.4
-      gaxios: 5.0.0
+      gaxios: 5.0.1
       gcp-metadata: 5.0.0
-      gtoken: 6.0.1
+      gtoken: 6.1.1
       jws: 4.0.0
       lru-cache: 6.0.0
     dev: false
     engines:
       node: '>=12'
     resolution:
-      integrity: sha512-1eC6yaCrPfkv3bwtb3e0AOct7E7xR/uikDyXNo/j8Wd6a1ldRgAey5FmaDGNJnHNDPLtDiENQLYsA69eXOF5sA==
+      integrity: sha512-wCWs44jLT3cbzONVk2NKK1sfWaKCqzR21cudG3r9tV53/DC/wImxEr7HK5OBlEU5Q1iepZsrdFOxvzmC0M/YRQ==
   /google-p12-pem/4.0.0:
     dependencies:
       node-forge: 1.3.1
@@ -381,16 +373,16 @@ packages:
     hasBin: true
     resolution:
       integrity: sha512-lRTMn5ElBdDixv4a86bixejPSRk1boRtUowNepeKEVvYiFlkLuAJUVpEz6PfObDHYEKnZWq/9a2zC98xu62A9w==
-  /gtoken/6.0.1:
+  /gtoken/6.1.1:
     dependencies:
-      gaxios: 4.3.3
+      gaxios: 5.0.1
       google-p12-pem: 4.0.0
       jws: 4.0.0
     dev: false
     engines:
       node: '>=12.0.0'
     resolution:
-      integrity: sha512-J0vebk6u6i4rLTM0lQq25SdusCLMvujYNZeAouyPvSbGlcjw7P8L3W9INIFnlXUx+AUD7TDoM1mgdhzH+XX7DQ==
+      integrity: sha512-HPM4VzzPEGxjQ7T2xLrdSYBs+h1c0yHAUiN+8RHPDoiZbndlpg9Sx3SjWcrTt9+N3FHsSABEpjvdQVan5AAuZQ==
   /handlebars/4.7.7:
     dependencies:
       minimist: 1.2.5
@@ -430,6 +422,14 @@ packages:
       node: '>= 6'
     resolution:
       integrity: sha512-dFcAjpTQFgoLMzC2VwU+C/CbS7uRL0lWmxDITmqm7C+7F0Odmj6s9l6alZc6AELXhrnggM2CeWSXHGOdX2YtwA==
+  /iconv-lite/0.6.3:
+    dependencies:
+      safer-buffer: 2.1.2
+    dev: false
+    engines:
+      node: '>=0.10.0'
+    resolution:
+      integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==
   /inflight/1.0.6:
     dependencies:
       once: 1.4.0
@@ -455,7 +455,7 @@ packages:
       integrity: sha512-hFoiJiTl63nn+kstHGBtewWSKnQLpyb155KHheA1l39uvtO9nWIop1p3udqPcUd/xbF1VLMO4n7OI6p7RbngDg==
   /json-bigint/1.0.0:
     dependencies:
-      bignumber.js: 9.0.2
+      bignumber.js: 9.1.0
     dev: false
     resolution:
       integrity: sha512-SiPv/8VpZuWbvLSMtTDU8hEfrZWg/mH/nV/b4o0CYbSxu1UIQPLdwKOCIyLQX+VIPO5vrLX3i8qtqFyhdPSUSQ==
@@ -666,6 +666,13 @@ packages:
     dev: false
     resolution:
       integrity: sha512-V2hovdzFbOi77/WajaSMXk2OLm+xNIeQdMMuB7icj7bk6zi2F8GGAxigcnDFpJHbNyNcgyJDiP+8nOrY5cZGrA==
+  /rimraf/3.0.2:
+    dependencies:
+      glob: 7.2.3
+    dev: false
+    hasBin: true
+    resolution:
+      integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==
   /safe-buffer/5.2.1:
     dev: false
     resolution:
@@ -676,6 +683,10 @@ packages:
     dev: false
     resolution:
       integrity: sha512-PaUSFsUaNNuKwkBijoAPHAK6/eM6VirvyPWlZ7BAQy4D+hCvh4B6lIG+nPdhbFfIbP+gTGBcrdsOaUs0F+ZBOQ==
+  /safer-buffer/2.1.2:
+    dev: false
+    resolution:
+      integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
   /secure-json-parse/2.4.0:
     dev: false
     resolution:
@@ -817,9 +828,11 @@ registry: 'https://registry.npmjs.org/'
 shrinkwrapMinorVersion: 9
 shrinkwrapVersion: 3
 specifiers:
+  encoding: ^0.1.13
   fastify: ^3.28.0
   fastify-formbody: ^5.2.0
   fastify-static: ^4.6.1
-  google-auth-library: ^8.0.3
+  google-auth-library: ^8.2.0
   handlebars: ^4.7.7
   point-of-view: ^5.2.0
+  rimraf: ^3.0.2

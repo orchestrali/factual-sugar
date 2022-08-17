@@ -329,6 +329,11 @@ function savevisit(e) {
       //console.log(res);
       
       
+    })
+    .fail(function() {
+      alert("Oh no, there was an error saving your visit. Please try again later!");
+        saving = false;
+        $("#savevisit").text("Save");
     });
   } else {
     $("#newvisit p").text("Please select a complete date for your visit");
@@ -454,7 +459,7 @@ function sortnear(pos) {
     });
     $("#list").children().remove();
     $("#list").append("<table></table>");
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 50; i++) {
       let j = distances[i].i;
       display(towers[j],distances[i]);
     }

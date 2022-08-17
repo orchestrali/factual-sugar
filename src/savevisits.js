@@ -1,5 +1,5 @@
 const fs = require("fs");
-
+const rimraf = require("rimraf");
 
 module.exports = function savevisits(obj, cb) {
   //console.log(obj["obj[date]"]);
@@ -8,7 +8,7 @@ module.exports = function savevisits(obj, cb) {
   files.sort();
   let oldpath = "data/" + id +"/"+ files[files.length-1];
   if (files.length > 9) {
-    fs.rmSync("data/"+id+"/"+files[0]);
+    rimraf("data/"+id+"/"+files[0], (err) => {if (err) console.log(err)});
   }
   let visits = require("../"+oldpath);
   let v = {};

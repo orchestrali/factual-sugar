@@ -630,6 +630,7 @@ function towerdetail(t) {
     <li>${t.Place}, ${t.County}, ${t.Country}</li>
     <li>${t.Dedicn}</li>
     <li><a href="https://www.google.com/maps/@${t.Lat},${t.Long},17z?hl=en" target="blank">${t.Lat}, ${t.Long}</a></li>
+    <li><a href="https://www.google.com/maps/place/${t.Postcode.replace(/ /g, "+")}" target="blank">${t.Postcode}</a></li>
     <li>${t.Bells} bells, ${t.weight} in ${t.Note}</li>
     <li class="bells">
       Click here to see bell details ${bells}

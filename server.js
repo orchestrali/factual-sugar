@@ -52,7 +52,7 @@ fastify.get("/", function(request, reply) {
   for (let i = 1; i <= 31; i++) {
     params.days.push(i);
   }
-  for (let i = 2022; i > 1960; i--) {
+  for (let i = 2022; i > 1949; i--) {
     params.years.push(i);
   }
   // request.query.paramName <-- a querystring example

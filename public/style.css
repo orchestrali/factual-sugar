@@ -140,15 +140,17 @@ table.bells {
   padding-right: 10px;
 }
 
-#credit {
+.credit, #credit {
   font-size: 10pt;
 }
-#credit p:first-child {
-  margin-top: 50px;
+.credit p:first-child {
   margin-bottom: 0;
 }
-#credit p:last-child {
+.credit p:last-child {
   margin-top: 0;
+}
+#credit p {
+  margin-top: 50px;
 }
 
 .delete {

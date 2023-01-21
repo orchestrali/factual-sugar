@@ -86,6 +86,20 @@ $(function() {
     $("#towerdetail").show();
   });
   
+  //view tower detail from a visit
+  $("#visitdetail").on("click", "li:first-child", (e) => {
+    $("#towerdetail ul").children().remove();
+    $("#detail").append(towerdetail(currenttower));
+    if (visited.includes(currenttower.TowerID)) {
+      $("#towervisits").append(`<li class="header">Previous visits</li>`);
+      visits.filter(v => v.towerID === currenttower.TowerID).forEach(v => {
+        $("#towervisits").append(`<li id="l${v.id}">${v.date}</li>`);
+      });
+    }
+    $("#visitdetail").hide();
+    $("#towerdetail").show();
+  });
+  
   //view visit detail from my towers
   $("#mylist").on("click", "tr", visitdetail);
   
@@ -94,9 +108,9 @@ $(function() {
   $(".delete").on("click", delvisit);
   
   $("#towerdetail").on("click", ".back", (e) => {
-    currenttower = null;
+    if (!currentvisit) currenttower = null;
     $("#towerdetail").hide();
-    view === "all" ? $("#container").show() : $("#list").show();
+    view === "all" ? $("#container").show() : currentvisit ? $("#visitdetail").show() : $("#list").show();
   });
   $("#visitdetail").on("click", ".back", (e) => {
     $("#visitdetail").hide();
@@ -612,6 +626,7 @@ function buildtable() {
 function vdetail(v) {
   let t = towers.find(o => o.TowerID === v.towerID);
   let html = `<ul>
+    <li><button>View tower info</button></li>
     <li>${t.Place}, ${t.County}, ${t.Country}</li>
     <li>${t.Dedicn}</li>
     <li>Visited ${v.date}</li>

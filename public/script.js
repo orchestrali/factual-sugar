@@ -302,13 +302,19 @@ function savevisit(e) {
           vis.place = currenttower.Place + ", " + currenttower.Dedicn;
           let j = visits.findIndex(v => v.id === vis.id);
           let i = visits.findIndex(v => v.date < vis.date);
-          if (j > -1) {
+          if (j > -1 && visits[j].date == vis.date) {
             visits.splice(j, 1, vis);
           } else if (i === -1) {
             visits.push(vis);
+            if (j > -1) $(`tr#v${vis.id}`).detach();
             $("#visits").append(`<tr id="v${vis.id}"><td>${vis.place}</td><td>${vis.date}</td><tr>`);
           } else {
             visits.splice(i, 0, vis);
+            let n = i+1;
+            if (j > -1) {
+              if (i > j) n--;
+              $("tr#v"+vis.id).remove();
+            }
             $("#visits > tr:nth-child("+(i+1)+")").before(`<tr id="v${vis.id}"><td>${vis.place}</td><td>${vis.date}</td><tr>`);
           }
 

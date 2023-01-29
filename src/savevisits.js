@@ -16,12 +16,16 @@ module.exports = function savevisits(obj, cb) {
   let date = v.date;
   let j = visits.findIndex(o => o.id == v.id);
   let i = visits.findIndex(o => o.date < date);
-  if (j > -1) {
+  if (j > -1 && visits[j].date == date) {
     visits.splice(j, 1, v);
   } else if (i === -1) {
     visits.push(v);
+    if (j > -1) visits.splice(j, 1);
   } else {
     visits.splice(i, 0, v);
+    if (j > -1) {
+      j > i ? visits.splice(j+1, 1) : visits.splice(j, 1);
+    }
   }
   //console.log(v);
   let file = Date.now();

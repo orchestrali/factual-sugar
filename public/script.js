@@ -200,6 +200,7 @@ function setupvisits() {
         $("#n"+visits[i].towerID+" .dedication").append("<span> ✓ visited</span>");
       }
     }
+    $("p.known").after('<p id="known-summary">'+visits.length+' visits, '+visited.length+' unique towers visited</p>');
   });
   
 }
@@ -229,6 +230,7 @@ function addvisit(e) {
   $("#notes").val("");
   $("#towerinfo").children().remove();
   $("#towerinfo").append(`<div class="place">${place}</div><div class="dedication">${t.Dedicn}</div>`);
+  
   $("#towerdetail,#visitdetail").hide();
   $("#newvisit").show();
 }
@@ -268,6 +270,7 @@ function delvisit(e) {
       }
       $("#visitdetail").hide();
       currentvisit = null;
+      $("#known-summary").text(visits.length + " visits, "+visited.length+" unique towers visited");
       view === "mytowers" ? $("#mylist").show() : $("#towerdetail").show();
     }
   });
@@ -337,6 +340,7 @@ function savevisit(e) {
           $("#visitdetail ul").remove();
           $("#visitdetail").append(vdetail(vis));
           $("#newvisit").hide();
+          $("#known-summary").text(visits.length + " visits, "+visited.length+" unique towers visited");
           $("#visitdetail").show();
           saving = false;
           $("#savevisit").text("Save");

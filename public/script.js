@@ -172,7 +172,7 @@ function setupsort() {
   sortowers = [];
   for (let i = 0; i < towers.length; i++) {
     let t = towers[i];
-    let o = {i: i, place: t.Place, country: t.Country, code: countries[t.Country], bells: t.Bells, id: t.TowerID, lbs: t.Wt};
+    let o = {i: i, place: t.Place, country: t.Country, code: countries[t.Country], bells: t.Bells, id: t.TowerID, lbs: t.Wt, UR: t.UR};
     sortowers.push(o);
   }
 }
@@ -200,6 +200,7 @@ function setupvisits() {
         $("#n"+visits[i].towerID+" .dedication").append("<span> ✓ visited</span>");
       }
     }
+    $("p.known").after('<p id="known-summary">'+visits.length+' visits, '+visited.length+' unique towers visited</p>');
   });
   
 }
@@ -229,6 +230,7 @@ function addvisit(e) {
   $("#notes").val("");
   $("#towerinfo").children().remove();
   $("#towerinfo").append(`<div class="place">${place}</div><div class="dedication">${t.Dedicn}</div>`);
+  
   $("#towerdetail,#visitdetail").hide();
   $("#newvisit").show();
 }
@@ -268,6 +270,7 @@ function delvisit(e) {
       }
       $("#visitdetail").hide();
       currentvisit = null;
+      $("#known-summary").text(visits.length + " visits, "+visited.length+" unique towers visited");
       view === "mytowers" ? $("#mylist").show() : $("#towerdetail").show();
     }
   });
@@ -337,6 +340,7 @@ function savevisit(e) {
           $("#visitdetail ul").remove();
           $("#visitdetail").append(vdetail(vis));
           $("#newvisit").hide();
+          $("#known-summary").text(visits.length + " visits, "+visited.length+" unique towers visited");
           $("#visitdetail").show();
           saving = false;
           $("#savevisit").text("Save");
@@ -434,15 +438,28 @@ function rearrange() {
   $("tr.divider").remove();
   $("#nav ul li").remove();
   let divider = builddivider(sortowers[0]);
-  $("#alltowers").append(`<tr class="divider"><td><a href="#${divider}" id="${divider}">${sortby === "numbells" ? sortowers[0].bells : sortby === "lbs" ? divider.slice(3)+"cwt" : divider}</a></td></tr>`);
+  $("#alltowers").append(`<tr class="divider"><td><a href="#${divider}" id="${divider}">${divider}</a></td></tr>`);
+  let num = 0;
+  let ur = 0;
   for (let i = 0; i < sortowers.length; i++) {
     let next = builddivider(sortowers[i]);
     if (next != divider) {
-      $("#alltowers").append(`<tr class="divider"><td><a href="#${next}" id="${next}">${sortby === "numbells" ? sortowers[i].bells : sortby === "lbs" ? next.slice(3)+"cwt" : next}</a></td></tr>`);
+      if (sortby != "place") {
+        $("#"+divider).text((sortby === "numbells" ? sortowers[i-1].bells : sortby === "lbs" ? divider.slice(3)+"cwt" : divider) + " ("+num+" towers, "+ur+" unringable)");
+      }
+      $("#alltowers").append(`<tr class="divider"><td><a href="#${next}" id="${next}">${next}</a></td></tr>`);
       divider = next;
+      num = 1;
+      ur = 0;
+    } else {
+      num++;
     }
+    if (sortowers[i].UR === "u/r") ur++;
     let id = "t"+sortowers[i].id;
     $("#alltowers").append($("#"+id).detach());
+    if (sortby != "place" && i === sortowers.length-1) {
+      $("#"+divider).text((sortby === "numbells" ? sortowers[0].bells : sortby === "lbs" ? divider.slice(3)+"cwt" : divider) + " ("+num+" towers, "+ur+" unringable)");
+    }
   }
   setupnav();
 }

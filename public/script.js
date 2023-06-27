@@ -661,9 +661,14 @@ function vdetail(v) {
 function towerdetail(t) {
   let bells = `<table class="bells"><thead><tr><th>Bell</th><th>Weight</th><th>Cast date</th></tr></thead>`;
   t.bells.forEach(b => {
-    bells += `<tr><td>`+b.BellRole+`</td><td>`+b.weight+`</td><td>`+b.CastDate+`</td></tr>`;
+    bells += `<tr><td>`+b.BellRole+`</td><td>`+(b.weight === "0–0–0" ? " " : b.weight)+`</td><td>`+b.CastDate+`</td></tr>`;
   });
   bells += `</table>`;
+  let webarr = t.WebPage.split(" ");
+  let webpage = "";
+  webarr.forEach(u => {
+    webpage += '<li><a href="'+u+'" target="blank">'+u+'</a></li>';
+  });
   let html = `
     <li>${t.Place}, ${t.County}, ${t.Country}</li>
     <li>${t.Dedicn}</li>
@@ -673,7 +678,7 @@ function towerdetail(t) {
     <li class="bells">
       Click here to see bell details ${bells}
     </li>
-    <li><a href="${t.WebPage}" target="blank">${t.WebPage}</a></li>
+    ${webpage}
     <li><a href="https://dove.cccbr.org.uk/detail.php?tower=${t.TowerID}" target="blank">Page in Dove's Guide</a></li>
     <li>${t.Practice.length ? "Practice " + t.Practice : "no practice info"}</li>
   `;

@@ -70,7 +70,7 @@ $(function() {
     $("#towerdetail ul").children().remove();
     
     let id = Number(e.currentTarget.id.slice(1));
-    let tower = towers.find(t => t.TowerID === id);
+    let tower = towers.find(t => t.RingID === id);
     if (tower) {
       currenttower = tower;
       $("#detail").append(towerdetail(tower));
@@ -78,7 +78,7 @@ $(function() {
     
     if (visited.includes(id)) {
       $("#towervisits").append(`<li class="header">Previous visits</li>`);
-      visits.filter(v => v.towerID === id).forEach(v => {
+      visits.filter(v => v.ringID === id).forEach(v => {
         $("#towervisits").append(`<li id="l${v.id}">${v.date}</li>`);
       });
     }
@@ -90,9 +90,9 @@ $(function() {
   $("#visitdetail").on("click", "li:first-child", (e) => {
     $("#towerdetail ul").children().remove();
     $("#detail").append(towerdetail(currenttower));
-    if (visited.includes(currenttower.TowerID)) {
+    if (visited.includes(currenttower.RingID)) {
       $("#towervisits").append(`<li class="header">Previous visits</li>`);
-      visits.filter(v => v.towerID === currenttower.TowerID).forEach(v => {
+      visits.filter(v => v.ringID === currenttower.RingID).forEach(v => {
         $("#towervisits").append(`<li id="l${v.id}">${v.date}</li>`);
       });
     }
@@ -172,7 +172,7 @@ function setupsort() {
   sortowers = [];
   for (let i = 0; i < towers.length; i++) {
     let t = towers[i];
-    let o = {i: i, place: t.Place, country: t.Country, code: countries[t.Country], bells: t.Bells, id: t.TowerID, lbs: t.Wt, UR: t.UR};
+    let o = {i: i, place: t.Place, country: t.Country, code: countries[t.Country], bells: t.Bells, id: t.RingID, lbs: t.Wt, UR: t.UR};
     sortowers.push(o);
   }
 }
@@ -194,10 +194,10 @@ function setupvisits() {
     for (let i = 0; i < visits.length; i++) {
       $("#visits").append(`<tr id="v${visits[i].id}"><td>${visits[i].place}</td><td>${visits[i].date}</td></tr>`);
       if (visits[i].id >= visitid) visitid = visits[i].id + 1;
-      if (!visited.includes(visits[i].towerID)) {
-        visited.push(visits[i].towerID);
-        $("#t"+visits[i].towerID+" .dedication").append("<span> ✓ visited</span>");
-        $("#n"+visits[i].towerID+" .dedication").append("<span> ✓ visited</span>");
+      if (!visited.includes(visits[i].ringID)) {
+        visited.push(visits[i].ringID);
+        $("#t"+visits[i].ringID+" .dedication").append("<span> ✓ visited</span>");
+        $("#n"+visits[i].ringID+" .dedication").append("<span> ✓ visited</span>");
       }
     }
     $("p.known").after('<p id="known-summary">'+visits.length+' visits, '+visited.length+' unique towers visited</p>');
@@ -211,8 +211,8 @@ function visitdetail(e) {
   let visit = visits.find(v => v.id === id);
   if (visit) {
     $("#visitdetail").append(vdetail(visit));
-    let tid = visit.towerID;
-    currenttower = towers.find(t => t.TowerID === tid);
+    let tid = visit.ringID;
+    currenttower = towers.find(t => t.RingID === tid);
   }
   currentvisit = visit;
   $("#mylist,#towerdetail").hide();
@@ -258,12 +258,12 @@ function delvisit(e) {
       alert("Oh no, there was an error deleting this visit. Please try again later!");
     } else {
       let id = currentvisit.id;
-      let tid = currentvisit.towerID;
+      let tid = currentvisit.ringID;
       $("#v"+id).remove();
       $("#l"+id).remove();
       let i = visits.findIndex(v => v.id === id);
       if (i > -1) visits.splice(i, 1);
-      if (visits.filter(v => v.towerID === tid).length === 0) {
+      if (visits.filter(v => v.ringID === tid).length === 0) {
         $("#t"+tid +" .dedication span").remove();
         $("#n"+tid +" .dedication span").remove();
         visited = visited.filter(v => v != tid);
@@ -274,6 +274,10 @@ function delvisit(e) {
       view === "mytowers" ? $("#mylist").show() : $("#towerdetail").show();
     }
   });
+}
+
+function downloadvisits() {
+  
 }
 
 function savevisit(e) {
@@ -291,6 +295,7 @@ function savevisit(e) {
     obj: {
       id: currentvisit ? currentvisit.id : visitid,
       towerID: currenttower.TowerID,
+      ringID: currenttower.RingID,
       date: date.join("-"),
       notes: $("textarea#notes").val()
     }
@@ -321,16 +326,16 @@ function savevisit(e) {
             $("#visits > tr:nth-child("+(i+1)+")").before(`<tr id="v${vis.id}"><td>${vis.place}</td><td>${vis.date}</td><tr>`);
           }
 
-          if (!visited.includes(vis.towerID)) {
-            visited.push(vis.towerID);
-            $("#t"+vis.towerID+" .dedication").append(`<span> ✓ visited</span>`);
-            $("#n"+vis.towerID+" .dedication").append(`<span> ✓ visited</span>`);
+          if (!visited.includes(vis.ringID)) {
+            visited.push(vis.ringID);
+            $("#t"+vis.ringID+" .dedication").append(`<span> ✓ visited</span>`);
+            $("#n"+vis.ringID+" .dedication").append(`<span> ✓ visited</span>`);
           }
 
           if (view !== "mytowers") {
             $("#towervisits").children().remove();
             $("#towervisits").append(`<li class="header">Previous visits</li>`);
-            visits.filter(v => v.towerID === vis.towerID).forEach(v => {
+            visits.filter(v => v.ringID === vis.ringID).forEach(v => {
               $("#towervisits").append(`<li id="l${v.id}">${v.date}</li>`);
             });
           }
@@ -516,8 +521,8 @@ function buildplace(t) {
 function display(t,d) {
   //console.log(t.UR);
   let places = buildplace(t);
-  let visit = visited.includes(t.TowerID) ? "<span> ✓ visited</span>" : "";
-  let html = `<tr id="n${t.TowerID}" class="tower${(t.UR === "u/r" ? " unringable" : "")}"><td class="distance">${d.d}km</td><td><div class="place">${places}</div><div class="dedication">${t.Dedicn}, ${t.Bells} bells${visit}</div></td></tr>`;
+  let visit = visited.includes(t.RingID) ? "<span> ✓ visited</span>" : "";
+  let html = `<tr id="n${t.RingID}" class="tower${(t.UR === "u/r" ? " unringable" : "")}"><td class="distance">${d.d}km</td><td><div class="place">${places}</div><div class="dedication">${t.Dedicn}, ${t.Bells} bells${visit}</div></td></tr>`;
   $("#list table").append(html);
 }
 
@@ -638,7 +643,7 @@ function buildtable() {
     let country = modcountry(t.Country, t.ISO3166code);
     let county = modcounty(t.County);
     let unring = t.UR === "u/r" ? " unringable" : "";
-    $("#alltowers").append(`<tr class="tower${unring}" id="t${t.TowerID}">
+    $("#alltowers").append(`<tr class="tower${unring}" id="t${t.RingID}">
       <td><div class="place">${t.Place}, ${county}, ${country}</div>
           <div class="dedication">${t.Dedicn}, ${t.Bells+unring}</div></td>
     </tr>`);
@@ -647,7 +652,7 @@ function buildtable() {
 }
 
 function vdetail(v) {
-  let t = towers.find(o => o.TowerID === v.towerID);
+  let t = towers.find(o => o.RingID === v.ringID);
   let html = `<ul>
     <li><button>View tower info</button></li>
     <li>${t.Place}, ${t.County}, ${t.Country}</li>

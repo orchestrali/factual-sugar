@@ -17,7 +17,7 @@ module.exports = function buildtable() {
     let county = modcounty(t.County);
     let unring = t.UR === "u/r" ? " unringable" : "";
     let place = t.Place+", "+ (county.length ? county + ", " : "") + country;
-    table += `<tr class="tower${unring}" id="t${t.TowerID}">
+    table += `<tr class="tower${unring}" id="t${t.RingID}">
       <td><div class="place">${place}</div>
           <div class="dedication">${t.Dedicn}, ${t.Bells} bells${unring}</div></td>
     </tr>`;

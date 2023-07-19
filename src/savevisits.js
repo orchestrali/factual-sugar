@@ -12,7 +12,7 @@ module.exports = function savevisits(obj, cb) {
   }
   let visits = require("../"+oldpath);
   let v = {};
-  ["id","towerID","date","notes"].forEach((w,i) => v[w] = i < 2 ? Number(obj["obj["+w+"]"]) : obj["obj["+w+"]"]);
+  ["id","towerID","ringID","date","notes"].forEach((w,i) => v[w] = i < 3 ? Number(obj["obj["+w+"]"]) : obj["obj["+w+"]"]);
   let date = v.date;
   let j = visits.findIndex(o => o.id == v.id);
   let i = visits.findIndex(o => o.date < date);

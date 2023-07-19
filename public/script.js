@@ -134,6 +134,7 @@ $(function() {
   
   $(".add").on("click", addvisit);
   $(".edit").on("click", editvisit);
+  $("#download").on("click", downloadvisits);
   
 });
 
@@ -277,7 +278,20 @@ function delvisit(e) {
 }
 
 function downloadvisits() {
+  let file = `towerID,ringID,place,date,notes
+  `;
+  visits.forEach(v => {
+    file += [v.towerID, v.ringID, '"'+v.place+'"', v.date, '"'+v.notes+'"'].join(",");
+    file += `
+    `;
+  });
+  const a = document.createElement('a');
+  const blob = new Blob([file], {type: "text/plain"});
+  a.href = URL.createObjectURL(blob);
+  a.download = "my-tower-visits.csv";
+  a.click();
   
+  URL.revokeObjectURL(a.href);
 }
 
 function savevisit(e) {

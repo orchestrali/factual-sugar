@@ -4,11 +4,11 @@ const rimraf = require("rimraf");
 module.exports = function savevisits(obj, cb) {
   //console.log(obj["obj[date]"]);
   let id = obj.email;
-  let files = fs.readdirSync("data/"+id);
+  let files = fs.readdirSync("/data/"+id);
   files.sort();
   let oldpath = "data/" + id +"/"+ files[files.length-1];
   if (files.length > 9) {
-    rimraf("data/"+id+"/"+files[0], (err) => {if (err) console.log(err)});
+    rimraf("/data/"+id+"/"+files[0], (err) => {if (err) console.log(err)});
   }
   let visits = require("../"+oldpath);
   let v = {};
@@ -29,7 +29,7 @@ module.exports = function savevisits(obj, cb) {
   }
   //console.log(v);
   let file = Date.now();
-  let npath = "data/"+id+"/"+file+".json";
+  let npath = "/data/"+id+"/"+file+".json";
   fs.writeFile(npath,JSON.stringify(visits,null,2), (err) => {
     if (err) {
       console.log(err);

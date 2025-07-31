@@ -10,7 +10,8 @@ module.exports = function savevisits(obj, cb) {
   if (files.length > 9) {
     rimraf("/data/"+id+"/"+files[0], (err) => {if (err) console.log(err)});
   }
-  let visits = require("../"+oldpath);
+  let visits = [];
+  //let visits = require("../"+oldpath);
   let v = {};
   ["id","towerID","ringID","date","notes"].forEach((w,i) => v[w] = i < 3 ? Number(obj["obj["+w+"]"]) : obj["obj["+w+"]"]);
   let date = v.date;
@@ -27,7 +28,7 @@ module.exports = function savevisits(obj, cb) {
       j > i ? visits.splice(j+1, 1) : visits.splice(j, 1);
     }
   }
-  //console.log(v);
+  console.log(v);
   let file = Date.now();
   let npath = "/data/"+id+"/"+file+".json";
   fs.writeFile(npath,JSON.stringify(visits,null,2), (err) => {

@@ -28,7 +28,7 @@ module.exports = function savevisits(obj, cb) {
       j > i ? visits.splice(j+1, 1) : visits.splice(j, 1);
     }
   }
-  console.log(v);
+  //console.log(v);
   let file = Date.now();
   let npath = "/data/"+id+"/"+file+".json";
   fs.writeFile(npath,JSON.stringify(visits,null,2), (err) => {

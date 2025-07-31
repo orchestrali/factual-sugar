@@ -1,5 +1,5 @@
 const fs = require("fs");
-const data = require("./data.json");
+
 const {OAuth2Client} = require('google-auth-library');
 const client = new OAuth2Client(process.env.CLIENT);
 const buildvisits = require("./buildvisits.js");
@@ -35,8 +35,8 @@ async function verify(token, cb) {
   const userid = payload['email'];
   
   let visits = [];
-  if (fs.existsSync("data/"+userid)) {
-    fs.readdir("data/"+userid, (err, files) => {
+  if (fs.existsSync("/data/"+userid)) {
+    fs.readdir("/data/"+userid, (err, files) => {
       if (err) console.log(err);
       files.sort();
       visits = require("../data/"+userid+"/"+files[files.length-1]);
@@ -45,8 +45,8 @@ async function verify(token, cb) {
     });
   } else {
     let name = Date.now();
-    fs.mkdirSync("data/"+userid);
-    fs.writeFile("data/"+userid+"/"+name+".json", "[]", (err) => {
+    fs.mkdirSync("/data/"+userid);
+    fs.writeFile("/data/"+userid+"/"+name+".json", "[]", (err) => {
       if (err) console.log(err);
       cb(userid, visits);
     });

@@ -3,8 +3,9 @@ const buildvisits = require("./buildvisits.js");
 
 module.exports = function getvisits(userid, cb) {
   let visits = [];
-  if (fs.existsSync("data/"+userid)) {
-    fs.readdir("data/"+userid, (err, files) => {
+  if (fs.existsSync("/data/"+userid)) {
+    console.log("directory exists");
+    fs.readdir("/data/"+userid, (err, files) => {
       if (err) console.log(err);
       files.sort();
       visits = require("../data/"+userid+"/"+files[files.length-1]);
@@ -12,9 +13,10 @@ module.exports = function getvisits(userid, cb) {
       cb(visits);
     });
   } else {
+    console.log("making directory");
     let name = Date.now();
-    fs.mkdirSync("data/"+userid);
-    fs.writeFile("data/"+userid+"/"+name+".json", "[]", (err) => {
+    fs.mkdirSync("/data/"+userid);
+    fs.writeFile("/data/"+userid+"/"+name+".json", "[]", (err) => {
       if (err) console.log(err);
       cb(visits);
     });

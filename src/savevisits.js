@@ -10,8 +10,8 @@ module.exports = function savevisits(obj, cb) {
   if (files.length > 9) {
     rimraf("/data/"+id+"/"+files[0], (err) => {if (err) console.log(err)});
   }
-  let visits = [];
-  //let visits = require("../"+oldpath);
+  //let visits = [];
+  let visits = require("/"+oldpath);
   let v = {};
   ["id","towerID","ringID","date","notes"].forEach((w,i) => v[w] = i < 3 ? Number(obj["obj["+w+"]"]) : obj["obj["+w+"]"]);
   let date = v.date;

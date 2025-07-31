@@ -8,7 +8,7 @@ module.exports = function getvisits(userid, cb) {
     fs.readdir("/data/"+userid, (err, files) => {
       if (err) console.log(err);
       files.sort();
-      visits = require("../data/"+userid+"/"+files[files.length-1]);
+      visits = require("/data/"+userid+"/"+files[files.length-1]);
       buildvisits(visits);
       cb(visits);
     });

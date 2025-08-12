@@ -19,6 +19,7 @@ $(function() {
   window.onerror = function(msg, src, lineno, colno, error) {
     console.log(msg);
     console.log(src);
+    return true;
   }
   
   $.get("towers.json", function(data) {

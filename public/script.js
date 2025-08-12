@@ -12,7 +12,7 @@ var visits;
 var visited = [];
 var visitid = 1;
 var saving = false;
-var scroll;
+var scrollamount;
 
 $(function() {
   
@@ -70,7 +70,7 @@ $(function() {
   //view tower detail
   $("body").on("click", "tr.tower", (e) => {
     if (["nearby","mytowers"].includes(view)) {
-      scroll = window.scrollY;
+      scrollamount = window.scrollY;
     }
     $("#towerdetail ul").children().remove();
     
@@ -116,7 +116,7 @@ $(function() {
     if (!currentvisit) currenttower = null;
     $("#towerdetail").hide();
     view === "all" ? $("#container").show() : currentvisit ? $("#visitdetail").show() : $("#list").show();
-    if (view != "all" && !currentvisit) window.scrollTo(0,scroll);
+    if (view != "all" && !currentvisit) window.scrollTo(0,scrollamount);
   });
   $("#visitdetail").on("click", ".back", (e) => {
     $("#visitdetail").hide();

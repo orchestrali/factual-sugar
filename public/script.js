@@ -124,6 +124,7 @@ $(function() {
     if (view === "mytowers") {
       currenttower = null;
       $("#mylist").show();
+      window.scrollTo(0,scrollamount);
     } else {
       $("#towerdetail").show();
     }

@@ -9,6 +9,7 @@ var updating = false;
 const savevisits = require("./src/savevisits.js");
 const delvisit = require("./src/delvisit.js");
 const getvisits = require("./src/getvisits.js");
+//const teststuff = require("./src/test.js");
 
 // Require the fastify framework and instantiate it
 const fastify = require("fastify")({
@@ -17,13 +18,13 @@ const fastify = require("fastify")({
 });
 
 // Setup our static files
-fastify.register(require("fastify-static"), {
+fastify.register(require("@fastify/static"), {
   root: path.join(__dirname, "public"),
   prefix: "/" // optional: default '/'
 });
 
 // fastify-formbody lets us parse incoming forms
-fastify.register(require("fastify-formbody"));
+fastify.register(require("@fastify/formbody"));
 
 // point-of-view is a templating manager for fastify
 fastify.register(require("point-of-view"), {
@@ -40,6 +41,7 @@ fastify.register(require("point-of-view"), {
 // Our main GET home page route, pulls from src/pages/index.hbs
 fastify.get("/", function(request, reply) {
   //console.log("get");
+  //teststuff();
   // params is an object we'll pass to our handlebars template
   let params = {
     greeting: "Hello Node!",

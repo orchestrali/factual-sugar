@@ -69,7 +69,7 @@ $(function() {
   
   //view tower detail
   $("body").on("click", "tr.tower", (e) => {
-    if (["nearby","mytowers"].includes(view)) {
+    if (view === "nearby") {
       scrollamount = window.scrollY;
     }
     $("#towerdetail ul").children().remove();
@@ -213,6 +213,7 @@ function setupvisits() {
 }
 
 function visitdetail(e) {
+  scrollamount = window.scrollY;
   $("#visitdetail ul").remove();
   let id = Number(e.currentTarget.id.slice(1));
   let visit = visits.find(v => v.id === id);

@@ -70,7 +70,7 @@ $(function() {
   //view tower detail
   $("body").on("click", "tr.tower", (e) => {
     if (view === "nearby") {
-      scroll = $("body").scrollTop();
+      scroll = window.scrollY;
     }
     $("#towerdetail ul").children().remove();
     
@@ -116,7 +116,7 @@ $(function() {
     if (!currentvisit) currenttower = null;
     $("#towerdetail").hide();
     view === "all" ? $("#container").show() : currentvisit ? $("#visitdetail").show() : $("#list").show();
-    if (view === "nearby" && !currentvisit) $("body").scrollTop(scroll);
+    if (view === "nearby" && !currentvisit) window.scroll(0,scroll);
   });
   $("#visitdetail").on("click", ".back", (e) => {
     $("#visitdetail").hide();

@@ -1,6 +1,7 @@
 var towers;
 var sortowers;
 var distances;
+//which tower list: "all", "nearby", "mytowers"
 var view = "all";
 var currentloc;
 var currenttower;
@@ -11,6 +12,7 @@ var visits;
 var visited = [];
 var visitid = 1;
 var saving = false;
+var scroll;
 
 $(function() {
   
@@ -67,6 +69,9 @@ $(function() {
   
   //view tower detail
   $("body").on("click", "tr.tower", (e) => {
+    if (view === "nearby") {
+      scroll = $("body").scrollTop();
+    }
     $("#towerdetail ul").children().remove();
     
     let id = Number(e.currentTarget.id.slice(1));
@@ -111,6 +116,7 @@ $(function() {
     if (!currentvisit) currenttower = null;
     $("#towerdetail").hide();
     view === "all" ? $("#container").show() : currentvisit ? $("#visitdetail").show() : $("#list").show();
+    if (view === "nearby" && !currentvisit) $("body").scrollTop(scroll);
   });
   $("#visitdetail").on("click", ".back", (e) => {
     $("#visitdetail").hide();

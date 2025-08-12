@@ -116,7 +116,7 @@ $(function() {
     if (!currentvisit) currenttower = null;
     $("#towerdetail").hide();
     view === "all" ? $("#container").show() : currentvisit ? $("#visitdetail").show() : $("#list").show();
-    if (view === "nearby" && !currentvisit) window.scroll(0,scroll);
+    if (view === "nearby" && !currentvisit) window.scrollTo(0,scroll);
   });
   $("#visitdetail").on("click", ".back", (e) => {
     $("#visitdetail").hide();

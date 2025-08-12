@@ -15,6 +15,11 @@ var saving = false;
 var scroll;
 
 $(function() {
+
+  window.onerror = function(msg, src, lineno, colno, error) {
+    console.log(msg);
+    console.log(src);
+  }
   
   $.get("towers.json", function(data) {
     towers = data;
@@ -69,7 +74,7 @@ $(function() {
   
   //view tower detail
   $("body").on("click", "tr.tower", (e) => {
-    if (view === "nearby") {
+    if (["nearby","mytowers"].includes(view)) {
       scroll = window.scrollY;
     }
     $("#towerdetail ul").children().remove();
@@ -116,7 +121,7 @@ $(function() {
     if (!currentvisit) currenttower = null;
     $("#towerdetail").hide();
     view === "all" ? $("#container").show() : currentvisit ? $("#visitdetail").show() : $("#list").show();
-    if (view === "nearby" && !currentvisit) window.scrollTo(0,scroll);
+    if (view != "all" && !currentvisit) window.scrollTo(0,scroll);
   });
   $("#visitdetail").on("click", ".back", (e) => {
     $("#visitdetail").hide();

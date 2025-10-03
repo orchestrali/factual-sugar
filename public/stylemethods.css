@@ -24,6 +24,10 @@ input {
   padding: 5px;
 }
 
+#search label {
+  margin-left: 6px;
+}
+
 button {
   background-color: #bbbbf2;
   border: 2px solid currentColor;

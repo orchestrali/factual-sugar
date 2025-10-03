@@ -226,8 +226,65 @@ function sendsearch(query) {
   xhr.onload = function () {
     console.log("loaded!");
     $("#container").contents().remove();
-    $("#container").append("results loaded");
+    //$("#container").append("results loaded");
     let res = JSON.parse(xhr.responseText);
-    console.log(res);
+    //
+    if (res.length) {
+      buildtable(res);
+    } else {
+      console.log(res);
+    }
+    
   }
+}
+
+var differentfields = ["classification", "huntBells", "stationaryBells", "symmetry", "huntPath", "pbOrder"];
+function buildtable(res) {
+  let cols = queryobj.fields.split(" ");
+  let table = `<table id="results" class="sortable"><thead><th>`+cols.join("</th><th>")+"</th></thead><tbody>";
+  res.forEach(o => {
+    table += `<tr>`;
+    cols.forEach(k => {
+      let s = "";
+      if (differentfields.includes(k)) {
+        s = formatinfo(k, o[k]);
+      } else if (o[k]) {
+        s = o[k];
+      }
+      table += `<td>${s}</td>`;
+    });
+    table += `</tr>`;
+  });
+  table += `</tbody></table>`;
+  $("#container").append(table);
+}
+
+function formatinfo(field, val) {
+  let string = "";
+  switch (field) {
+    case "classification":
+      let arr = [];
+      for (let key in val) {
+        if (val[key]) arr.push(key);
+      }
+      string = arr.join(", ");
+      break;
+    case "huntBells": case "stationaryBells": case "symmetry":
+      string = val.join(", ");
+      break;
+    case "huntPath":
+      string = val.join(",");
+      break;
+    case "pbOrder":
+      if (val.length === 1) {
+        string = val[0].join(",");
+      } else if (val.length > 1) {
+        string = "";
+        val.forEach(a => {
+          string += "["+a.join(",")+"]";
+        });
+      }
+      break;
+  }
+  return string;
 }

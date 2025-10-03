@@ -14,11 +14,10 @@
     "point-of-view": "^5.2.0",
     "google-auth-library": "^8.2.0",
     "rimraf": "^3.0.2",
-    "encoding": "^0.1.13",
-    "mongodb": "^6.20.0"
+    "encoding": "^0.1.13"
   },
   "engines": {
-    "node": "16.x"
+    "node": "12.x"
   },
   "repository": {
     "url": "https://glitch.com/edit/#!/glitch-mvp-node"

@@ -10,7 +10,7 @@ const savevisits = require("./src/savevisits.js");
 const delvisit = require("./src/delvisit.js");
 const getvisits = require("./src/getvisits.js");
 //const teststuff = require("./src/test.js");
-
+const mongorouter = require("./src/mongodb/router.js");
 //const mongoconnect = require("./src/mongoose/startconnect.js");
 
 //mongoconnect()
@@ -92,6 +92,11 @@ fastify.post("/delete", function(request, reply) {
   delvisit(request.body, (err) => {
     reply.send(err ? "error" : "ok");
   });
+});
+
+fastify.post("/find/:model", async function(req, reply) {
+  const results = await mongorouter(req.params.model, req.body);
+  return results;
 });
 
 function loop() {

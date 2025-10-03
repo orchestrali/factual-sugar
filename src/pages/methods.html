@@ -23,87 +23,107 @@
     <main>
 
       <form>
-        <label for="query">
-          Query:
-        </label>
-        <textarea id="query" rows="8" cols="20"></textarea>
-        <ul>
-          <li><label>
-            <input type="checkbox" name="title" />method title
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="oldtitle" />previous titles of the method
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="name" />method name (portion before class and stage)
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="stage" />stage
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="classification" />four properties: little, differential, plain, treble dodging
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="class" />method class
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="leadLength" />lead length
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="leadHead" />leadhead
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="leadHeadCode" />leadhead code
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="numHunts" />how many hunt bells
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="huntBells" />hunt bells
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="huntPath" />path of primary hunt bell
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="stationaryBells" />stationary bells
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="numWorking" />how many working bells
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="pbOrder" />place bell order(s)
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="leadsInCourse" />leads in course
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="maxBlows" />maximum consecutive blows in the same place
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="fchGroups" />false coursehead groups
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="symmetry" />symmetry
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="pn" />place notation
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="pnFull" />full place notation in my format
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="leadtruth" />true leads
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="coursetruth" />true plain course
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="ccNum" />complib id
-          </label></li>
-          <li><label>
-            <input type="checkbox" name="notes" />notes
-          </label></li>
-        </ul>
+        <h4>Query</h4>
+        <div id="search">
+          <div class="row" id="row1">
+            <label for="field1">Search field:</label>
+            <select id="field1" class="field">
+              <option></option>
+              <option>Stage</option>
+              <option>Class</option>
+              <option>Name</option>
+              <option>Symmetry</option>
+              <option>Leadlength</option>
+              <option>Leadheads</option>
+              <option>Place notation</option>
+            </select>
+            <span id="span1"></span>
+            
+          </div>
+          <button id="addrow">+</button>
+          
+        </div>
+
+        <div id="fields">
+          <h4>Fields to return</h4>
+          <ul>
+            <li><label>
+              <input type="checkbox" name="title" />method title
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="oldtitle" />previous titles of the method
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="name" />method name (portion before class and stage)
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="stage" />stage
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="classification" />four properties: little, differential, plain, treble dodging
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="class" />method class
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="leadLength" />lead length
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="leadHead" />leadhead
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="leadHeadCode" />leadhead code
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="numHunts" />how many hunt bells
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="huntBells" />hunt bells
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="huntPath" />path of primary hunt bell
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="stationaryBells" />stationary bells
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="numWorking" />how many working bells
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="pbOrder" />place bell order(s)
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="leadsInCourse" />leads in course
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="maxBlows" />maximum consecutive blows in the same place
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="fchGroups" />false coursehead groups
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="symmetry" />symmetry
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="pn" />place notation
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="pnFull" />full place notation in my format
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="leadtruth" />true leads
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="coursetruth" />true plain course
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="ccNum" />complib id
+            </label></li>
+            <li><label>
+              <input type="checkbox" name="notes" />notes
+            </label></li>
+          </ul>
+        </div>
         
         <button type="button" id="submit">submit</button>
       </form>

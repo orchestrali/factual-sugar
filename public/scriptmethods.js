@@ -13,8 +13,8 @@ function router() {
 
 function buildquery() {
   let fields = [];
-  $('input[type="checkbox"]').each(i => {
-    if ($(this).is(":checked")) fields.push($(this).attr("name"));
+  $('input[type="checkbox"]').each((i,e) => {
+    if ($(e).is(":checked")) fields.push($(e).attr("name"));
   });
   let q = $("#query").val();
   if (q.length === 0) q = {};

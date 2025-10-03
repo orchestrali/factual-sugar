@@ -108,7 +108,7 @@ function buildquery() {
   });
   let q = buildsearch();
   
-  let query = {query: q, fields: fields.join(" ")};
+  let query = {search: q, fields: fields.join(" ")};
   return query;
 }
 

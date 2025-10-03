@@ -30,7 +30,7 @@ function addsearchrow() {
   row += `
   </select>
   <span id="span${rownum}"></span>
-  <button id="remove${rownum}" class="remove">-</button>`;
+  <button id="remove${rownum}" class="remove" type="button">-</button>`;
   $("#addrow").before(row);
   numsearchrows++;
 }

@@ -3,6 +3,7 @@ const { MongoClient } = require('mongodb');
 const uri = "mongodb+srv://"+process.env.USER+":"+process.env.PASS+"@cluster0.wompx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 module.exports = async function runGetStarted() {
+  console.log("attempting to connect");
   const client = new MongoClient(uri);
 
   try {

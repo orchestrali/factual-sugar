@@ -96,7 +96,7 @@ fastify.post("/delete", function(request, reply) {
 
 fastify.post("/find/:model", async function(req, reply) {
   const results = await mongorouter(req.params.model, req.body);
-  return results;
+  reply.send(results);
 });
 
 function loop() {

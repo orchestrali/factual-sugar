@@ -94,7 +94,7 @@ function router() {
 
 function buildquery() {
   let fields = [];
-  $('input[type="checkbox"]').each((i,e) => {
+  $('#fields input[type="checkbox"]').each((i,e) => {
     if ($(e).is(":checked")) fields.push($(e).attr("name"));
   });
   let q = buildsearch();

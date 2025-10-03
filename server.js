@@ -11,6 +11,11 @@ const delvisit = require("./src/delvisit.js");
 const getvisits = require("./src/getvisits.js");
 //const teststuff = require("./src/test.js");
 
+const mongoconnect = require("./src/mongoose/startconnect.js");
+
+mongoconnect()
+.catch(console.dir);
+
 // Require the fastify framework and instantiate it
 const fastify = require("fastify")({
   // set this to true for detailed logging:

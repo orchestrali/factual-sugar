@@ -3,7 +3,7 @@ const models = ["method", "performance", "oldPerformance", "name", "bbperformanc
 
 module.exports = async function router(model, req) {
   if (models.includes(model)) {
-    let o = {model: model+"s", query: JSON.parse(req)};
+    let o = {model: model+"s", query: req};
     const results = await connectsearch(o);
     console.log("num results: "+results.length);
     return results;

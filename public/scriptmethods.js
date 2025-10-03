@@ -4,6 +4,7 @@ const symm = ["palindromic", "double", "rotational"];
 const leadheads = ["Plain Bob", "Grandsire", "other"];
 
 var numsearchrows = 1;
+var queryobj;
 
 $(function() {
   $("#search").on("change", ".field", searchfieldchange);
@@ -89,6 +90,8 @@ function searchfieldchange(e) {
 
 function router() {
   let query = buildquery();
+  queryobj = query;
+  console.log(query);
   sendsearch(JSON.stringify(query));
 }
 
@@ -126,7 +129,7 @@ function buildsearch() {
         $("input."+field).each((i,e) => {
           if ($(e).is(":checked")) {
             let v = $(e).val();
-            console.log(v);
+            //console.log(v);
             vals.push(v);
           }
         });

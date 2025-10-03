@@ -99,9 +99,10 @@ fastify.get("/methods", function(request, reply) {
 });
 
 fastify.post("/find/:model", async function(req, reply) {
-  const results = await mongorouter(req.params.model, req.body);
-  console.log("results acquired");
-  reply.send(results);
+  console.log(req.body);
+  //const results = await mongorouter(req.params.model, req.body);
+  //console.log("results acquired");
+  //reply.send(results);
 });
 
 function loop() {

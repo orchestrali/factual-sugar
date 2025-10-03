@@ -1,20 +1,27 @@
 const { MongoClient } = require('mongodb');
+const find = require("./findfields.js");
 
 const uri = "mongodb+srv://"+process.env.USER+":"+process.env.PASS+"@cluster0.wompx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
-module.exports = async function runGetStarted() {
+module.exports = async function runGetStarted(o) {
   console.log("attempting to connect");
   const client = new MongoClient(uri);
 
   try {
     const database = client.db('bellringing');
+
+    if (o) {
+      const results = await find(database, o.model, o.query);
+      return results;
+    }
+    /*
     const methods = database.collection('methods');
 
     const query = {title: "Kent Treble Bob Major"};
     const kent = await methods.findOne(query);
 
     console.log(kent);
-    
+    */
   } finally {
     await client.close();
   }

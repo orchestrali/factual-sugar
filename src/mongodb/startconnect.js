@@ -14,6 +14,7 @@ module.exports = async function runGetStarted(o) {
       console.log("searching");
       console.log(o);
       const results = await find(database, o.model, o.query);
+      console.log(results.length);
       return results;
     }
     /*

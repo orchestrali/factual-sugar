@@ -3,7 +3,7 @@ const places = "1234567890ETABCD";
 
 
 $(function() {
-  
+  $("#submit").on("click", router);
 });
 
 function router() {
@@ -16,7 +16,7 @@ function buildquery() {
   $('input[type="checkbox"]').each(i => {
     if ($(this).is(":checked")) fields.push($(this).attr("name"));
   });
-  let q = $("textarea").val();
+  let q = $("#query").val();
   if (q.length === 0) q = {};
   let query = {query: q, fields: fields.join(" ")};
   return query;
@@ -29,6 +29,8 @@ function sendsearch(query) {
 
   xhr.onload = function () {
     console.log("loaded!");
+    $("#container").contents().remove();
+    $("#container").append("results loaded");
     let res = JSON.parse(xhr.responseText);
     console.log(res);
   }

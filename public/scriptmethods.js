@@ -137,8 +137,8 @@ function buildsearch() {
           //multiple name searches
         } else if ($(".name").length) {
           let val = $(".name").val();
-          if (val.startsWith("/")) {
-            let regex = new RegExp(val);
+          if (val.startsWith("/") && val.endsWith("/")) {
+            let regex = val.slice(0,-1);
             query.name = {$regex: regex};
           } else if (val.length) {
             query.name = val;
@@ -151,8 +151,8 @@ function buildsearch() {
         } else if ($(".pn").length) {
           let pn = $(".pn").val();
           if (pn.length) {
-            let regex = new RegExp(pn);
-            query.pn = {$regex: regex};
+            
+            query.pn = {$regex: pn};
           }
         }
         

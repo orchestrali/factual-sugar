@@ -94,10 +94,14 @@ fastify.post("/delete", function(request, reply) {
   });
 });
 
+fastify.get("/methods", function(request, reply) {
+  reply.view("/src/pages/methods.html");
+});
+
 fastify.post("/find/:model", async function(req, reply) {
   const results = await mongorouter(req.params.model, req.body);
   console.log("results acquired");
-  reply.send(results);
+  reply.send(JSON.stringify(results));
 });
 
 function loop() {

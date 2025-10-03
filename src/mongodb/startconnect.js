@@ -11,6 +11,8 @@ module.exports = async function runGetStarted(o) {
     const database = client.db('bellringing');
 
     if (o) {
+      console.log("searching");
+      console.log(o);
       const results = await find(database, o.model, o.query);
       return results;
     }

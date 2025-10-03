@@ -141,7 +141,7 @@ function buildsearch() {
         } else if ($(".name").length) {
           let val = $(".name").val();
           if (val.startsWith("/") && val.endsWith("/")) {
-            let regex = val.slice(0,-1);
+            let regex = val.slice(1,-1);
             query.name = {$regex: regex};
           } else if (val.length) {
             query.name = val;

@@ -14,7 +14,8 @@
     "@fastify/view": "^9.0.0",
     "google-auth-library": "^8.2.0",
     "rimraf": "^4.0.2",
-    "encoding": "^0.1.13"
+    "encoding": "^0.1.13",
+    "mongodb": "^4.0.0"
   },
   "engines": {
     "node": "14.x"

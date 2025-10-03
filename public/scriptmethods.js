@@ -91,8 +91,14 @@ function searchfieldchange(e) {
 function router() {
   let query = buildquery();
   queryobj = query;
-  console.log(query);
-  sendsearch(JSON.stringify(query));
+  //console.log(query);
+  $("#container").contents().remove();
+  if (query.fields.length) {
+    $("#container").append("loading...");
+    sendsearch(JSON.stringify(query));
+  } else {
+    $("#container").append("select at least one field to display!");
+  }
 }
 
 function buildquery() {

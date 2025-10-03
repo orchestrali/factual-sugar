@@ -91,7 +91,7 @@ function searchfieldchange(e) {
 function router() {
   let query = buildquery();
   queryobj = query;
-  //console.log(query);
+  console.log(query);
   $("#container").contents().remove();
   if (query.fields.length) {
     $("#container").append("loading...");

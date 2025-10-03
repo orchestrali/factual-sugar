@@ -7,13 +7,13 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "fastify": "^3.28.0",
-    "@fastify/formbody": "^6.0.0",
-    "@fastify/static": "^5.0.0",
+    "fastify": "^4.x",
+    "@fastify/formbody": "^7.0.0",
+    "@fastify/static": "^7.0.0",
     "handlebars": "^4.7.7",
     "point-of-view": "^5.2.0",
     "google-auth-library": "^8.2.0",
-    "rimraf": "^3.0.2",
+    "rimraf": "^4.0.2",
     "encoding": "^0.1.13"
   },
   "engines": {

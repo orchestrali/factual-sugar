@@ -111,9 +111,10 @@ function loop() {
 }
 
 // Run the server and report out to the logs
-fastify.listen(process.env.PORT, '0.0.0.0', function(err, address) {
+fastify.listen({port: process.env.PORT}, function(err, address) {
   if (err) {
     fastify.log.error(err);
+    console.error(err);
     process.exit(1);
   }
   console.log(`Your app is listening on ${address}`);

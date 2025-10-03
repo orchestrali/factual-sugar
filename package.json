@@ -15,7 +15,7 @@
     "google-auth-library": "^8.2.0",
     "rimraf": "^4.0.2",
     "encoding": "^0.1.13",
-    "mongodb": "^4.0.0"
+    "mongodb": "^6.0.0"
   },
   "engines": {
     "node": "16.x"

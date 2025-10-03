@@ -12,7 +12,7 @@ module.exports = async function runGetStarted(o) {
 
     if (o) {
       console.log("searching");
-      console.log(o);
+      console.log(o.query);
       const results = await find(database, o.model, o.query);
       console.log(results.length);
       return results;

@@ -108,7 +108,7 @@ function buildquery() {
   });
   let q = buildsearch();
   
-  let query = {search: q, fields: fields.join(" ")};
+  let query = {query: q, fields: fields.join(" ")};
   return query;
 }
 
@@ -225,16 +225,14 @@ function buildsearch() {
 }
 
 function sendsearch(query) {
-  $.post("/find/method", query, (res) => {
-    console.log("loaded!");
-    $("#container").contents().remove();
-    if (res.length) {
-      buildtable(res);
-    } else {
-      console.log(res);
-    }
+  $.post({
+    url: "/find/method",
+    contentType: "application/json",
+    data: query,
+    success: handleresults
   });
   /*
+  
   var xhr = new XMLHttpRequest();
   xhr.open('POST', "/find/method", true);
   xhr.send(query);
@@ -246,6 +244,16 @@ function sendsearch(query) {
     let res = JSON.parse(xhr.responseText);
   }
   */
+}
+
+function handleresults(res) {
+  console.log("loaded!");
+  $("#container").contents().remove();
+  if (res.length) {
+    buildtable(res);
+  } else {
+    console.log(res);
+  }
 }
 
 var differentfields = ["classification", "huntBells", "stationaryBells", "symmetry", "huntPath", "pbOrder"];

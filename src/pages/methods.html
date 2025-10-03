@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Bellringing method database search">
+
+    <title>Method database</title>
+
+    
+    <!-- import the webpage's stylesheet -->
+    <link rel="stylesheet" href="/stylemethods.css">
+  </head>
+  <body>
+    <header>
+      <h1>Methods</h1>
+    </header>
+
+    <main>
+
+      <form>
+        <label for="query">
+          Query:
+        </label>
+        <textarea id="query" rows="8" cols="20"></textarea>
+        <ul>
+          <li><label>
+            <input type="checkbox" name="title" />method title
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="oldtitle" />previous titles of the method
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="name" />method name (portion before class and stage)
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="stage" />stage
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="classification" />four properties: little, differential, plain, treble dodging
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="class" />method class
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="leadLength" />lead length
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="leadHead" />leadhead
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="leadHeadCode" />leadhead code
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="numHunts" />how many hunt bells
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="huntBells" />hunt bells
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="huntPath" />path of primary hunt bell
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="stationaryBells" />stationary bells
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="numWorking" />how many working bells
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="pbOrder" />place bell order(s)
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="leadsInCourse" />leads in course
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="maxBlows" />maximum consecutive blows in the same place
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="fchGroups" />false coursehead groups
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="symmetry" />symmetry
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="pn" />place notation
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="pnFull" />full place notation in my format
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="leadtruth" />true leads
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="coursetruth" />true plain course
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="ccNum" />complib id
+          </label></li>
+          <li><label>
+            <input type="checkbox" name="notes" />notes
+          </label></li>
+        </ul>
+        
+        <button type="submit" id="submit">submit</button>
+      </form>
+
+
+    </main>
+
+    <script
+  src="https://code.jquery.com/jquery-3.6.0.min.js"
+  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+  crossorigin="anonymous"></script>
+  </body>
+</html>
+  

@@ -95,7 +95,7 @@ function router() {
   $("#container").contents().remove();
   if (query.fields.length) {
     $("#container").append("loading...");
-    sendsearch(JSON.stringify(query));
+    sendsearch(query);
   } else {
     $("#container").append("select at least one field to display!");
   }
@@ -225,23 +225,27 @@ function buildsearch() {
 }
 
 function sendsearch(query) {
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST', "/find/method", true);
-  xhr.send(query);
-
-  xhr.onload = function () {
+  $.post("/find/method", query, (res) => {
     console.log("loaded!");
     $("#container").contents().remove();
-    //$("#container").append("results loaded");
-    let res = JSON.parse(xhr.responseText);
-    //
     if (res.length) {
       buildtable(res);
     } else {
       console.log(res);
     }
+  });
+  /*
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', "/find/method", true);
+  xhr.send(query);
+
+  xhr.onload = function () {
     
+    
+    //$("#container").append("results loaded");
+    let res = JSON.parse(xhr.responseText);
   }
+  */
 }
 
 var differentfields = ["classification", "huntBells", "stationaryBells", "symmetry", "huntPath", "pbOrder"];

@@ -111,7 +111,7 @@ function loop() {
 }
 
 // Run the server and report out to the logs
-fastify.listen({port: process.env.PORT || 3000}, function(err, address) {
+fastify.listen({port: process.env.PORT, host: '0.0.0.0'}, function(err, address) {
   if (err) {
     fastify.log.error(err);
     console.error(err);

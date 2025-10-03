@@ -32,7 +32,7 @@ fastify.register(require("@fastify/static"), {
 fastify.register(require("@fastify/formbody"));
 
 // point-of-view is a templating manager for fastify
-fastify.register(require("point-of-view"), {
+fastify.register(require("@fastify/view"), {
   engine: {
     handlebars: require("handlebars")
   },

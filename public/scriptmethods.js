@@ -336,6 +336,9 @@ function handleresults(res) {
 
 var differentfields = ["classification", "huntBells", "stationaryBells", "symmetry", "huntPath", "pbOrder"];
 function buildtable(res) {
+  let s = res.length > 1 ? "s" : "";
+  let es = res.length > 1 ? "" : "es";
+  $("#container").append(`<p>${res.length} method${s} match${es}</p>`);
   let cols = queryobj.fields.split(" ");
   let table = `<table id="results" class="sortable"><thead><th>`+cols.join("</th><th>")+"</th></thead><tbody>";
   res.forEach(o => {

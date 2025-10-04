@@ -228,7 +228,7 @@ function sendsearch(query) {
   $.post({
     url: "/find/method",
     data: query,
-    processData: false,
+    traditional: true,
     success: handleresults
   });
   /*

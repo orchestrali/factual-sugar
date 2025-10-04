@@ -229,6 +229,7 @@ function sendsearch(query) {
     url: "/find/method",
     contentType: "application/json",
     data: query,
+    processData: false,
     success: handleresults
   });
   /*

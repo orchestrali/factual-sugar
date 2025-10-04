@@ -342,7 +342,10 @@ function buildtable(res) {
     table += `<tr>`;
     cols.forEach(k => {
       let s = "";
-      if (differentfields.includes(k)) {
+      if (k === "title") {
+        let url = "https://complib.org/method/"+o.ccNum;
+        s = `<a href="${url}" target="blank">${o[k]}</a>`;
+      } else if (differentfields.includes(k)) {
         s = formatinfo(k, o[k]);
       } else if (o[k]) {
         s = o[k];

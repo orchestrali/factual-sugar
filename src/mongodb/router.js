@@ -7,10 +7,9 @@ module.exports = async function router(model, req) {
     let q = buildquery(req);
     console.log(q);
     let o = {model: model+"s", query: q};
-    //const results = await connectsearch(o);
-    //console.log("num results: "+results.length);
-    //return results;
-    return "tested";
+    const results = await connectsearch(o);
+    console.log("num results: "+results.length);
+    return results;
   } else {
     return {error: "no such collection"};
   }

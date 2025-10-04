@@ -106,13 +106,91 @@ function buildquery() {
   $('#fields input[type="checkbox"]').each((i,e) => {
     if ($(e).is(":checked")) fields.push($(e).attr("name"));
   });
-  let q = buildsearch();
+  let q = buildsearchplain();
   
-  let query = {query: q, fields: fields.join(" ")};
+  let query = {fields: fields.join(" ")};
+  for (let key in q) {
+    let v = q[key];
+    query[key] = v;
+  }
   return query;
 }
 
 const fields = ["stage", "class", "name", "pn", "leadlength", "symmetry", "leadheads"];
+function buildsearchplain() {
+  let query = {};
+  let arrays = {};
+  fields.forEach(field => {
+    let vals;
+
+    switch (field) {
+      case "stage":
+        vals = [];
+        $("input.stage").each((i,e) => {
+          if ($(e).is(":checked")) {
+            let v = $(e).val();
+            vals.push(v);
+          }
+        });
+        arrays.stage = vals;
+        break;
+      case "class": case "symmetry":
+        vals = [];
+        $("input."+field).each((i,e) => {
+          if ($(e).is(":checked")) {
+            let v = $(e).val();
+            //console.log(v);
+            if (!vals.includes(v)) vals.push(v);
+          }
+        });
+        arrays[field] = vals;
+        break;
+      case "name": case "pn":
+        if ($("."+field).length > 1) {
+          //multiple name searches
+        } else if ($("."+field).length) {
+          let val = $("."+field).val();
+          query[field] = val;
+        }
+        break;
+      case "leadlength":
+        vals = [];
+        $(".leadlength").each((i,e) => {
+          let v = $(e).val();
+          if (v.length && v != "0") {
+            vals.push(v);
+          }
+        });
+        
+        if (vals.length) {
+          arrays.leadLength = vals;
+        }
+        break;
+      case "leadheads":
+        let checked = [];
+        $(".leadheads").each((i,e) => {
+          if ($(e).is(":checked")) {
+            let v = $(e).val();
+            if (!checked.includes(v)) checked.push(v);
+          }
+        });
+        if ([1,2].includes(checked.length)) {
+          query.leadheads = checked;
+        }
+        break;
+    }
+  });
+  
+  for (let key in arrays) {
+    if (arrays[key].length === 1) {
+      query[key] = arrays[key][0];
+    } else if (arrays[key].length > 1) {
+      query[key] = arrays[key].join(";");
+    }
+  }
+  return query;
+}
+
 function buildsearch() {
   let query = {};
   let arrays = {};

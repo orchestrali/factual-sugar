@@ -227,7 +227,6 @@ function buildsearch() {
 function sendsearch(query) {
   $.post({
     url: "/find/method",
-    contentType: "application/json",
     data: query,
     processData: false,
     success: handleresults

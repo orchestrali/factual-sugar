@@ -4,6 +4,7 @@ module.exports = function buildquery(o) {
   let q = {
     fields: o.fields
   };
+  if (!o.fields.includes("ccNum")) q.fields += " ccNum";
   let query = {};
 
   for (let key in o) {

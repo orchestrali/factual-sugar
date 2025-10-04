@@ -98,7 +98,7 @@ fastify.get("/methods", function(request, reply) {
   reply.view("/src/pages/methods.html");
 });
 
-fastify.post("/find/:model", async function(req, reply) {
+fastify.post("/find/:model", {}, async function(req, reply) {
   console.log(req.body);
   //const results = await mongorouter(req.params.model, req.body);
   //console.log("results acquired");

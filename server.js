@@ -45,7 +45,8 @@ fastify.register(require("@fastify/view"), {
 
 // Our main GET home page route, pulls from src/pages/index.hbs
 fastify.get("/", function(request, reply) {
-  console.log(request.url);
+  console.log(request.hostname);
+  console.log(request.headers.Host);
   //console.log("get");
   //teststuff();
   // params is an object we'll pass to our handlebars template

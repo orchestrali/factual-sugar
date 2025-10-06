@@ -1,0 +1,140 @@
+
+button.large {
+  font-size: 20pt;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+li.selected {
+  background-color: lightblue;
+}
+
+ul {
+  list-style-type: none;
+  padding-left: 2px;
+  margin: 5px;
+}
+
+fieldset {
+  border: none;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+td, th {
+  padding: 5px;
+}
+
+td {
+  border: 1px solid black;
+  max-width: 400px;
+}
+
+td:first-child {
+  color: navy;
+}
+td:first-child:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.errors {
+  color: red;
+}
+
+.hidden {
+  display: none;
+}
+
+.arrow {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 5px solid black;
+  margin-right: 5px;
+  transition: transform 600ms ease-in-out;
+}
+.arrow.rotate {
+  transform: rotate(90deg);
+}
+.arrow:hover {
+  cursor: pointer;
+}
+
+
+
+#alert {
+  max-width: 300px;
+  border: 3px solid black;
+  border-radius: 6px;
+  padding: 5px;
+  margin-bottom: 15px;
+  display: none;
+}
+#abandon {
+  color: red;
+}
+
+#displayopts ul {
+  margin-top: 0;
+}
+
+#methodnamelist {
+  min-width: 200px;
+  max-width: 400px;
+  height: 300px;
+  border: 1px solid black;
+  overflow: scroll;
+}
+
+#methodnamelist li {
+  border-bottom: 1px solid #cccccc;
+}
+#methodnamelist li:hover {
+  cursor: pointer;
+}
+
+#methodcollections li {
+  display: inline-block;
+  padding: 0 5px;
+  border-radius: 9px;
+  border: 1px solid lightblue;
+}
+
+#methodinfobox, #displayoptions, #methodcollections {
+  height: 0;
+  overflow: hidden;
+  transition: height 600ms ease-in-out;
+}
+#methodpanel h4:nth-of-type(-n+2) {
+  margin-bottom: 5px;
+}
+
+#lineopts {
+  display: none;
+  margin-left: 30px;
+}
+
+#methodbuttons, #addtocollection {
+  display: none;
+}
+
+#noteeditor, #noteviewer {
+  display: none;
+}
+
+#methodnoteslist li:hover {
+  cursor: pointer;
+}
+
+
+
+
+
+

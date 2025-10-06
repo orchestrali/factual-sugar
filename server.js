@@ -46,7 +46,6 @@ fastify.register(require("@fastify/view"), {
 // Our main GET home page route, pulls from src/pages/index.hbs
 fastify.get("/", function(request, reply) {
   console.log(request.hostname);
-  console.log(request.headers.Host);
   //console.log("get");
   //teststuff();
   // params is an object we'll pass to our handlebars template
@@ -56,7 +55,8 @@ fastify.get("/", function(request, reply) {
     years: [],
     days: [],
     visits: [],
-    uri: "https://"+process.env.URI
+    uri: "https://"+process.env.URI,
+    test: request.hostname === "towers.changeringing.net" ? "" : `<h4>TEST VERSION</h4>`;
   };
   for (let i = 1; i <= 31; i++) {
     params.days.push(i);

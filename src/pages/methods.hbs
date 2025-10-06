@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="https://sallyandbobminor.wordpress.com/wp-content/uploads/2025/07/bristol-major-short.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Bellringing method tool">
+
+    <title>Change Ringing Methods</title>
+
+    <!-- import the webpage's stylesheet -->
+    <link rel="stylesheet" href="/stylemethods.css" />
+    <script>
+      window.email = "{{email}}";
+    </script>
+  </head>
+  <body>
+    <!-- header ???? -->
+    {{test}}
+    
+    <div id="alert">
+      <p>You have unsaved changes! Abandon them?</p>
+      <button id="abandon">Yes</button><button id="stayonpage">No, stay on this page</button>
+    </div>
+
+    <div id="screens">
+      <button class="large" id="viewcollections">My collections</button>
+      <button class="large" id="addmethods">Add methods</button>
+      <!-- add "about" button here -->
+    </div>
+
+    <div id="addmethodscreen" style="display:none;">
+      <div>
+        <select id="methodclass">
+          <option>Bob</option>
+          <option>Place</option>
+          <option>Treble Bob</option>
+          <option>Delight</option>
+          <option>Surprise</option>
+          <option>Treble Place</option>
+          <option>Alliance</option>
+          <option>Hybrid</option>
+          <option>Principle</option>
+        </select>
+        <select id="methodstage">
+          <option value="4">4 - Minimus</option>
+          <option value="5">5 - Doubles</option>
+          <option value="6">6 - Minor</option>
+          <option value="7">7 - Triples</option>
+          <option value="8">8 - Major</option>
+          <option value="9">9 - Caters</option>
+          <option value="10">10 - Royal</option>
+          <option value="11">11 - Cinques</option>
+          <option value="12">12 - Maximus</option>
+          <option value="13">13 - Sextuples</option>
+          <option value="14">14 - Fourteen</option>
+          <option value="15">15 - Septuples</option>
+          <option value="16">16 - Sixteen</option>
+        </select>
+      </div>
+      <div>
+        <label for="methodsearch">Search: <input type="text" id="methodsearch" /></label>
+      </div>
+      <div id="methodnamelist">
+        <ul></ul>
+      </div>
+      <div id="methodbuttons">
+        <button id="viewmethod">View</button>
+        <button id="addmethod" class="addtocoll">Add to collection</button>
+        <div></div>
+      </div>
+    </div>
+
+    <div id="collectionlist">
+      <table class="sortable">
+        <thead><th>Collection</th><th>Methods</th></thead>
+        <tbody>
+          
+        </tbody>
+      </table>
+      <button id="newcollection">Create new collection</button>
+      <div id="newcollpanel" class="hidden">
+        <div><button id="cancelnewcoll" class="cancel">Cancel</button></div>
+        <label for="colltitle">Title: <input type="text" id="colltitle" /></label><button id="savecoll">Add</button>
+        <p class="errors" id="newcollerror"><p>
+      </div>
+    </div>
+
+    <div id="collectionpanel" style="display:none;">
+      <!--back to list button? or is that just at the top all the time?-->
+      <button id="editcollection">Edit collection</button>
+      <button id="cancelcolledits" class="edit">Cancel</button>
+      <button id="savecolledits" class="edit">Save changes</button>
+      <h3></h3>
+      <div id="edittitlepanel" class="edit">
+        <label for="titleedit">New title: <input type="text" id="titleedit" /></label>
+        <p class="errors" id="titleediterror"></p>
+      </div>
+      <table>
+        <thead><th>Method title</th></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="methodpanel" class="hidden">
+      <div id="methodbackcontainer"></div>
+      <h3 id="methodtitle">
+        
+      </h3>
+      <h4><div class="arrow"></div>Collections this method is in:</h4>
+      <div id="methodcollections"></div>
+      <div id="addtocollection">
+        <label for="choosecoll">Add to collection: </label>
+        <select id="choosecoll"></select>
+        <button id="addmethod">Save</button>
+      </div>
+      <h4><div class="arrow"></div>Display options</h4>
+      <div id="displayoptions">
+        
+        <fieldset id="displayopts">
+          <ul>
+          
+            <li><label for="grid"><input type="radio" id="grid" name="display" value="grid" checked />Grid</label></li>
+            <li><label for="lines"><input type="radio" id="lines" name="display" value="lines" />Line(s)</label></li>
+          </ul>
+        </fieldset>
+        <ul id="lineopts">
+          <li class="lineopt">
+            <select id="bluebell"></select>
+          </li>
+          <!--<li class="lineopt"></li>
+          <li class="lineopt"></li>-->
+        </ul>
+      </div>
+      <h4><div class="arrow"></div>Method info</h4>
+      <div id="methodinfobox"></div>
+      <div id="methodcontainer"></div>
+      <div id="methodnoteslist">
+        <button id="addmethodnote">Add note</button>
+        <ul></ul>
+      </div>
+      <div id="noteeditor">
+        <div>
+        <label for="notetitle">Title: <input type="text" id="notetitle" /></label>
+        </div>
+        <p class="errors" id="notetitleerror"></p>
+        <textarea id="note" rows="20" cols="30"></textarea>
+        <div><button id="savenote">Save</button></div>
+        
+      </div>
+      <div id="noteviewer">
+        <button id="noteback">Back to list</button>
+        <button id="editnote">Edit note</button>
+        <h4></h4>
+        
+      </div>
+    </div>
+    
+    <script
+  src="https://code.jquery.com/jquery-3.6.0.min.js"
+  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+  crossorigin="anonymous"></script>
+    <script src="jquery.svg.js"></script>
+    <script src="jquery.svgdom.js"></script>
+    <script src="/scriptmethods.js"></script>
+  </body>
+</html>

@@ -27,6 +27,7 @@ var currentmethod;
 var currentcollection;
 var currentnote;
 //detailed info of method being viewed
+//needs to have: pnFull, leadsInCourse, leadLength
 var methodobj;
 var stage;
 var rowarr;
@@ -37,11 +38,58 @@ var editing;
 //searching methods
 var searchval = "";
 
+//{saving} - parts where I need to save user input
+//[todo] - stuff to write or edit!
+
 
 $(function() {
   $("#methodcontainer").svg({onLoad: (o) => {
     svg = o;
   }});
+
+  //big button clicks
+  $("#abandon").on("click", homeview);
+  $("#viewcollections").on("click", homeclick);
+  $("#stayonpage").on("click", () => $("#alert").hide());
+
+  //method search functions
+  $("#addmethods").on("click", searchmethods);
+  //$("#methodsearch").on("keyup", methodkeyup);
+  $("#methodnamelist").on("click", "li", (e) => {
+    $("li.selected").removeClass("selected");
+    $(e.currentTarget).addClass("selected");
+    $("#methodbuttons").show();
+  });
+  $("#viewmethod").on("click", viewfromsearch);
+
+  //method functions
+  $("#displayopts").on("change", toggledisplay);
+  $("#bluebell").on("change", bluebellchange);
+  $("#collectionpanel").on("click", "td:first-child", methodclick);
+  $("#methodbackcontainer").on("click", "button", backfrommethod);
+  $(".arrow").on("click", dropdown);
+
+  //note functions
+  $("#addmethodnote").on("click", addnote);
+  $("#savenote").on("click", savenote);
+  $("#methodnoteslist").on("click", "li", viewnoteclick);
+  $("#noteback").on("click", () => {
+    $("#noteviewer").hide();
+    $("#methodnoteslist").show();
+  });
+  $("#editnote").on("click", editnote);
+  $("#notetitle").on("keyup", notetitlekeyup);
+
+  //collection functions
+  $("#collectionlist").on("click", "td.collection", collclick);
+  $("#colltitle,#titleedit").on("keyup", colltitlekeyup);
+  $("#newcollection").on("click", () => $("#newcollpanel").removeClass("hidden"));
+  $("#savecoll").on("click", savenewcoll);
+  $("#editcollection").on("click", editcollection);
+  $("#cancelcolledits").on("click", cancelcolledits);
+  $("#collectionpanel").on("click", ".remove", removecollmethod);
+  $("#savecolledits").on("click", savecolledits);
+  $("#collectionlist").on("click", ".remove", removecoll);
   
 });
 
@@ -51,6 +99,337 @@ $(function() {
 
 // ***** moving between screens?? *****
 
+//search screen
+function searchmethods() {
+  $("#collectionlist,#collectionpanel").hide();
+  $("#methodpanel").addClass("hidden");
+  $("#addmethodscreen").show();
+}
+
+//attempt to return to my collections
+function homeclick() {
+  if (editing) {
+    $("#alert").show();
+  } else {
+    homeview();
+  }
+}
+
+//return to my collections
+function homeview() {
+  $("#addmethodscreen,#collectionpanel,#methodpanel,#alert").hide();
+  //reset stuff
+  editing = false;
+  collectionedits = [];
+  currentmethod = null;
+  currentcollection = null;
+  currentnote = null;
+  $("#collectionlist").show();
+}
+
+function backfrommethod(e) {
+  let what = $(e.currentTarget).attr("id").slice(6);
+  $("#methodpanel").addClass("hidden");
+  currentmethod = null;
+  if (what === "collection") {
+    $("#collectionpanel").show();
+  } else {
+    //search
+  }
+}
+
+//from within a collection
+function methodclick(e) {
+  let cc = $(e.currentTarget).parent().attr("id");
+  let from = "collection";
+  //I've only prepared limited examples here
+  if (example[cc]) {
+    $("#collectionpanel").hide();
+    viewmethod(cc, from);
+  }
+}
+
+//view method via search
+function viewfromsearch(e) {
+  let id = $("#methodnamelist li.selected").attr("id");
+  let from = "search";
+  
+  if (id.startsWith("cc")) {
+    $("#addmethodscreen").hide();
+    viewmethod(id, from);
+  }
+}
+
+//view collection from list
+function collclick(e) {
+  let cid = $(e.currentTarget).parent().attr("id");
+  viewcoll(cid);
+}
+
+
+
+
+// ***** method search functions *****
+
+//build method title list
+function buildmethodlist() {
+  $("#methodnamelist ul").contents().remove();
+  let methodset = []; //get this based on search terms
+  methodset.forEach((m,i) => {
+    let name = m.slice(0,-6);
+    let cc = Object.keys(example).find(k => example[k].title === m);
+    let id = cc ? cc : "um"+i;
+    //if (name.endsWith(" Bob")) name = name.slice(0, -4);
+    $("#methodnamelist ul").append(`<li id="${id}">${name}</li>`);
+  });
+}
+
+//[todo]
+function methodkeyup(e) {
+  
+}
+
+function filtermethodlist(value) {
+  $("#methodnamelist li").filter(function() {
+    let text = $(this).text().toLowerCase();
+    $(this).toggle(checkname(text, value));
+  });
+}
+
+function checkname(name, val) {
+  let names = [name];
+  let vals = [val];
+
+  //includes something not a-z, a space, or 0-9
+  if (/[^a-z\s0-9]/.test(name)) {
+    let altname = respell(name);
+    if (altname != name) names.push(altname);
+    names.forEach(n => {
+      if (n.includes("'")) {
+        
+      }
+    });
+  }
+  
+  if (/[^a-z\s0-9]/.test(val)) {
+    let altval = respell(val);
+    if (altval != val) vals.push(altval);
+  }
+  
+  let res = false;
+  let i = 0, j = 0;
+  do {
+    res = names[i].indexOf(vals[j]) > -1;
+    j++;
+    if (j === vals.length) {
+      j = 0;
+      i++;
+    }
+  } while (!res && (i < names.length-1 || (i === names.length-1 && j < vals.length)));
+  
+  return res;
+}
+
+function respell(name) {
+  //'.()!-?&,£="/₃₁²™
+  //éèëøůáčöåòùûàóìäúñṟāêæâîü
+  let lstr = "áàäâāåčçéèëêēe̊íìïîīñóòöôōo̊øṟřšśúùüûūůæ₃₁²™";
+  let letters = {
+    a: "áàäâāå",
+    ae: "æ",
+    c: "čç",
+    e: "éèëêēe̊",
+    i: "íìïîī",
+    n: "ñ",
+    o: "óòöôōo̊ø",
+    r: "ṟř",
+    s: "šś",
+    u: "úùüûūů",
+    tm: "™",
+    "1": "₁",
+    "2": "²",
+    "3": "₃",
+  };
+  let alt = "";
+  for (let i = 0; i < name.length; i++) {
+    if (lstr.indexOf(name[i]) > -1) {
+      let l = Object.keys(letters).find(c => letters[c].indexOf(name[i]) > -1);
+      alt += l;
+    } else {
+      alt += name[i];
+    }
+  }
+  return alt;
+}
+
+//[todo]
+function addmethodfromsearch() {
+  
+}
+
+
+
+
+// ***** collection functions *****
+
+//only do this once at beginning, to preserve options (sorting etc.) for later
+//will need to update collection stuff elsewhere
+function buildcollections() {
+  if (account) {
+    let tbody = $("#collectionlist tbody");
+    //add base collection
+    let tr = `<tr id="all-my-methods"><td class="collection">All my methods</td><td>${mymethods.length}</td></tr>`;
+    tbody.append(tr);
+    //add others
+    mycollections.forEach(c => {
+      let num = mymethods.filter(m => m.collections.includes(c.id)).length;
+      let row = `<tr id="${c.id}"><td class="collection">${c.title}</td><td>${num}</td><td><button class="remove">-</button></td></tr>`;
+      tbody.append(row);
+    });
+  } else {
+    //display log in option
+    //do I even need this, it's probably a top level thing
+  }
+}
+
+function removecoll(e) {
+  let cid = $(e.currentTarget).parent().parent().attr("id");
+  //probably want a dialog to confirm deletion
+}
+
+function viewcoll(cid) {
+  let cmethods = cid === "all-my-methods" ? mymethods : mymethods.filter(m => m.collections.includes(cid));
+  cmethods.sort(sortmethods);
+  currentcollection = cid === "all-my-methods" ? allmymethods : mycollections.find(c => c.id === cid);
+  
+  $("#collectionpanel h3").text(currentcollection.title);
+  $("#titleedit").val(currentcollection.title);
+  let tbody = $("#collectionpanel tbody");
+  tbody.contents().remove();
+  
+  cmethods.forEach(m => {
+    let tr = `<tr id="${m.ccNum}"><td class="method">${m.title}</td><td class="edit"><button class="remove">-</button></td></tr>`;
+    tbody.append(tr);
+  });
+  
+  $("#collectionpanel .edit").hide();
+  $("#collectionlist").hide();
+  $("#collectionpanel").show();
+}
+
+function addemptycoll() {
+  $("#newcollection").hide();
+  $("#newcollpanel").removeClass("hidden");
+}
+
+function savenewcoll() {
+  let title = $("#colltitle").val().trim();
+  let err = checkcolltitle(title);
+  if (err) {
+    $("#newcollerror").text(err);
+  } else {
+    let coll = {
+      title: title,
+      id: "c"+Date.now()
+    };
+    mycollections.push(coll);
+    let row = `<tr id="${coll.id}"><td class="collection">${title}</td><td>0</td><td><button class="remove">-</button></td></tr>`;
+    $("#collectionlist tbody").append(row);
+    
+    cancelemptycoll();
+  }
+}
+
+function cancelemptycoll() {
+  $("#newcollection").show();
+  $("#newcollpanel").addClass("hidden");
+  $("#colltitle").val("");
+  $("#newcollerror").text("");
+}
+
+//editing a collection
+
+//start editing a collection
+function editcollection() {
+  //editing = true;
+  $("#editcollection").hide();
+  $("#collectionpanel .edit").show();
+}
+
+//{saving}
+function savecolledits() {
+  //title stuff
+  let title = $("#titleedit").val().trim();
+  let err = checkcolltitle(title, currentcollection.title);
+  if (err) {
+    $("#titleediterror").text(err);
+  } else {
+    //still need to do title stuff!
+    currentcollection.title = title;
+    $("#"+currentcollection.id + " td:first-child").text(title);
+    //methods removed
+    collectionedits.forEach(id => {
+      let m = mymethods.find(o => o.id === id);
+      let i = m.collections.indexOf(id);
+      m.collections.splice(i, 1);
+    });
+    let num = $("#collectionpanel tbody tr").length;
+    $("#"+currentcollection.id + " td:nth-child(2)").text(num.toString());
+    //return to collection screen
+    cancelcolledits();
+  }
+}
+
+function cancelcolledits() {
+  editing = false;
+  collectionedits = [];
+  //viewcoll will hide the edit stuff but won't show currently hidden things
+  $("#editcollection").show();
+  viewcoll(currentcollection.id);
+}
+
+function removecollmethod(e) {
+  editing = true;
+  let parent = $(e.currentTarget).parent().parent();
+  let mid = parent.attr("id");
+  collectionedits.push(mid);
+  parent.remove();
+}
+
+function colltitlekeyup(e) {
+  let id = $(e.currentTarget).attr("id");
+  let errp = id === "colltitle" ? "#newcollerror" : "#titleediterror";
+  $(errp).text("");
+  if (errp.startsWith("#t")) editing = true;
+}
+
+function checkcolltitle(title, edit) {
+  let err;
+  if (!title.length) {
+    err = "title cannot be blank";
+    return err;
+  }
+  let existing = mycollections.map(c => c.title);
+  if (edit) {
+    let i = existing.indexOf(edit);
+    existing.splice(i, 1);
+  }
+  existing.push("All my methods");
+  if (existing.includes(title)) {
+    err = "collection title already in use";
+  }
+  return err;
+}
+
+function sortmethods(a,b) {
+  if (sortby === "title") {
+    return a.title.localeCompare(b.title);
+  } else if (sortby === "added") {
+    let an = Number(a.id.slice(1));
+    let bn = Number(b.id.slice(1));
+    return an-bn;
+  }
+}
 
 
 
@@ -149,7 +528,45 @@ function savenote() {
 
 // ***** method viewing functions *****
 
+//given a method ccnum (as string with prefix "cc"), determine collections it could be added to
+function availablecolls(ccnum) {
+  let colls = [];
+  let m = mymethods.find(o => o.ccNum === ccnum);
+  if (m) {
+    colls = mycollections.filter(c => !m.collections.includes(c.id));
+  } else {
+    colls.push(allmymethods);
+    colls.push(...mycollections);
+  }
+  return colls;
+}
 
+//[todo]
+function addmethodtocoll() {
+  
+}
+
+function bluebellchange() {
+  bluebell = $("#bluebell").val();
+  drawmethod(methodobj);
+}
+
+//change method display
+function toggledisplay() {
+  let h;
+  if ($("#lines").is(":checked")) {
+    gridtype = "lines";
+    $("#lineopts").show();
+    h = "6em";
+  } else {
+    gridtype = "grid";
+    h = "4em";
+    $("#lineopts").hide();
+  }
+  buildrowarr();
+  drawmethod(methodobj);
+  $("#displayoptions").css("height", h);
+}
 
 //m is a string: "cc"+ccNum
 function viewmethod(m, from) {
@@ -386,6 +803,23 @@ function bellnum(n) {
 function rowstring(arr) {
   let r = arr.map(n => places[n-1]);
   return r.join("");
+}
+
+
+function buildrowarr() {
+  rowarr = [places.slice(0,stage).split("").map(bellnum)];
+  let lead = buildlead(methodobj.pnFull);
+  rowarr.push(...lead);
+  if (gridtype === "lines") {
+    let leads = 1;
+    let prev = rowarr[rowarr.length-1];
+    while (leads < methodobj.leadsInCourse) {
+      let next = buildrows(prev, methodobj.pnFull);
+      rowarr.push(...next);
+      leads++;
+      prev = rowarr[rowarr.length-1];
+    }
+  }
 }
 
 //build first lead, starting with rounds

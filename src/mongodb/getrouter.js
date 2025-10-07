@@ -6,6 +6,7 @@ module.exports = async function router(model, req) {
   if (models.includes(model)) {
     let o = {model: model+"s"};
     o.query = req ? buildquery(req) : {};
+    console.log(o.query);
     const results = await connectsearch("./find.js", o);
     console.log("num results: "+results.length);
     return results;

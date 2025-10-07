@@ -112,7 +112,7 @@ td:first-child:hover {
   overflow: hidden;
   transition: height 600ms ease-in-out;
 }
-#methodpanel h4:nth-of-type(-n+2) {
+#methodpanel > h4:nth-of-type(-n+2) {
   margin-bottom: 5px;
 }
 

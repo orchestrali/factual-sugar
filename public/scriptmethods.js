@@ -36,6 +36,7 @@ var sortby = "title";
 //currently just for editing a collection...
 var editing;
 //searching methods
+var searchparams = {};
 var searchval = "";
 
 //{saving} - parts where I need to save user input
@@ -43,6 +44,7 @@ var searchval = "";
 
 
 $(function() {
+  getmethods();
   $("#methodcontainer").svg({onLoad: (o) => {
     svg = o;
   }});
@@ -58,6 +60,7 @@ $(function() {
   $("#methodnamelist").on("click", "li", (e) => {
     $("li.selected").removeClass("selected");
     $(e.currentTarget).addClass("selected");
+    $("#addingdiv").addClass("hidden");
     $("#methodbuttons").show();
   });
   $("#viewmethod").on("click", viewfromsearch);
@@ -89,11 +92,59 @@ $(function() {
   $("#cancelcolledits").on("click", cancelcolledits);
   $("#collectionpanel").on("click", ".remove", removecollmethod);
   $("#savecolledits").on("click", savecolledits);
-  $("#collectionlist").on("click", ".remove", removecoll);
+  $("#collectionlist").on("click", ".remove", removecoll); //not functional yet
   
 });
 
 
+
+
+//get the methods!
+function getmethods() {
+  let o = {
+    fields: "title stage class ccNum pn pnFull leadsInCourse leadHeadCode leadLength",
+    stage: "4;5;6;7;8;9;10;11;12"
+  };
+
+  $.post("/find/method", o, (mm) => {
+    bigmethodobj = {};
+    methodnames = [{stage: 4, classes: []},{stage: 5, classes: []},{stage: 6, classes: []},{stage: 7, classes: []},{stage: 8, classes: []}, {stage: 9, classes: []}, {stage: 10, classes: []}, {stage: 11, classes: []}, {stage: 12, classes: []}];
+    mm.forEach(m => {
+      let small = {title: m.title, cc: "cc"+m.ccNum};
+      let stageo = methodnames[m.stage-4];
+      let co = stageo.classes.find(obj => obj.class === m.class);
+      if (co) {
+        co.methods.push(small);
+      } else {
+        stageo.classes.push({class: m.class, methods: [small]});
+      }
+      bigmethodobj[small.cc] = m;
+    });
+    console.log("methods retrieved");
+    setupuser();
+  });
+}
+
+//get saved stuff
+//preliminary version with local storage
+function setupuser() {
+  if (localStorage.getItem("account")) {
+    account = localStorage.getItem("account");
+    mymethods = JSON.parse(localStorage.getItem("mymethods"));
+    mycollections = JSON.parse(localStorage.getItem("mycollections"));
+  } else {
+    account = "accountname";
+    mymethods = [];
+    mycollections = [];
+  }
+  buildcollections();
+}
+
+function savelocal() {
+  localStorage.setItem("account", account);
+  localStorage.setItem("mymethods", JSON.stringify(mymethods));
+  localStorage.setItem("mycollections", JSON.stringify(mycollections));
+}
 
 
 
@@ -101,9 +152,9 @@ $(function() {
 
 //search screen
 function searchmethods() {
-  $("#collectionlist,#collectionpanel").hide();
+  $("#collectionlist,#collectionpanel,#addmethods").hide();
   $("#methodpanel").addClass("hidden");
-  $("#addmethodscreen").show();
+  $("#addmethodscreen,#viewcollections").show();
 }
 
 //attempt to return to my collections
@@ -117,14 +168,14 @@ function homeclick() {
 
 //return to my collections
 function homeview() {
-  $("#addmethodscreen,#collectionpanel,#methodpanel,#alert").hide();
+  $("#addmethodscreen,#collectionpanel,#methodpanel,#alert,#viewcollections").hide();
   //reset stuff
   editing = false;
   collectionedits = [];
   currentmethod = null;
   currentcollection = null;
   currentnote = null;
-  $("#collectionlist").show();
+  $("#collectionlist,#addmethods").show();
 }
 
 function backfrommethod(e) {
@@ -162,6 +213,7 @@ function viewfromsearch(e) {
 
 //view collection from list
 function collclick(e) {
+  $("#viewcollections").show();
   let cid = $(e.currentTarget).parent().attr("id");
   viewcoll(cid);
 }
@@ -171,17 +223,36 @@ function collclick(e) {
 
 // ***** method search functions *****
 
+const stagenames = ["Minimus", "Doubles", "Minor", "Triples", "Major", "Caters", "Royal", "Cinques", "Maximus"];
 //build method title list
 function buildmethodlist() {
   $("#methodnamelist ul").contents().remove();
-  let methodset = []; //get this based on search terms
+  let methodset = searchparamstuff(); //get this based on search terms
+  let stagename = stagenames[searchparams.stage-4];
+  if (methodset.length === 0) {
+    $("#methodnamelist ul").append(`<li>No ${searchparams.class} ${stagename} methods exist!</li>`);
+  }
+  
   methodset.forEach((m,i) => {
-    let name = m.slice(0,-6);
-    let cc = Object.keys(example).find(k => example[k].title === m);
+    let name = m.title.slice(0,-stagename.length-1);
+    let cc = m.cc;
+    let mine = mymethods.find(o => o.title === m.title);
+    if (mine) name = "✓ "+name;
     let id = cc ? cc : "um"+i;
     //if (name.endsWith(" Bob")) name = name.slice(0, -4);
     $("#methodnamelist ul").append(`<li id="${id}">${name}</li>`);
   });
+}
+
+function searchparamstuff() {
+  searchparams.stage = Number($("#methodstage").val());
+  searchparams.class = $("#methodclass option:checked").text();
+  let classo = methodnames[searchparams.stage-4].classes.find(o => o.class === searchparams.class);
+  if (classo) {
+    return classo.methods;
+  } else {
+    return [];
+  }
 }
 
 //[todo]
@@ -264,10 +335,55 @@ function respell(name) {
 
 //[todo]
 function addmethodfromsearch() {
-  
+  let mid = $("#methodnamelist li.selected").attr("id");
+  let cid = $("#colllist").val();
+  let mym = savemethods(mid, cid);
+  if (!mym) {
+    let li = $("#methodnamelist li.selected");
+    let text = li.text();
+    let ntext = "✓ "+text;
+    li.text(ntext);
+  }
+  $("#addingdiv").addClass("hidden");
 }
 
+function choosecollfromsearch() {
+  let mid = $("#methodnamelist li.selected").attr("id");
+  let colls = availablecolls(mid);
+  let html = colls.map(c => {
+    return `<option value="${c.id}">${c.title}</option>`;
+  }).join("");
+  $("#colllist").html(html);
+  $("#addingdiv").removeClass("hidden");
+}
 
+//mid: ccnum, cid: existing collection number
+function savemethod(mid, cid) {
+  let mym = mymethods.find(o => o.ccNum === mid);
+  if (mym) {
+    //already in mymethods
+    mym.collections.push(cid);
+  } else {
+    //get method info
+    let title = bigmethodinfo[mid].title;
+    let o = {
+      title: title,
+      notes: [],
+      ccNum: mid,
+      collections: [],
+      id: "m"+Date.now()
+    };
+    if (cid != "all-my-methods") o.collections.push(cid);
+    mymethods.push(o);
+  }
+  let trtd = $("tr#"+cid + " td:nth-child(2)");
+  let num = Number(trtd.text());
+  num++;
+  trtd.text(num.toString());
+  
+  savelocal();
+  return mym;
+}
 
 
 // ***** collection functions *****
@@ -377,6 +493,7 @@ function savecolledits() {
     $("#"+currentcollection.id + " td:nth-child(2)").text(num.toString());
     //return to collection screen
     cancelcolledits();
+    savelocal();
   }
 }
 
@@ -514,7 +631,7 @@ function savenote() {
     currentnote = o;
     $("#noteeditor").hide();
     viewnote(o.id, o.title);
-    
+    savelocal();
   }
   
 }

@@ -44,6 +44,7 @@ var searchval = "";
 
 
 $(function() {
+  $("#viewcollections").hide();
   getmethods();
   $("#methodcontainer").svg({onLoad: (o) => {
     svg = o;

@@ -58,7 +58,7 @@ $(function() {
   //method search functions
   $("#addmethods").on("click", searchmethods);
   $("#methodclass,#methodstage").on("change", buildmethodlist);
-  //$("#methodsearch").on("keyup", methodkeyup);
+  $("#methodsearch").on("keyup", methodkeyup);
   $("#methodnamelist").on("click", "li", (e) => {
     $("li.selected").removeClass("selected");
     $(e.currentTarget).addClass("selected");
@@ -246,6 +246,8 @@ function collclick(e) {
 const stagenames = ["Minimus", "Doubles", "Minor", "Triples", "Major", "Caters", "Royal", "Cinques", "Maximus"];
 //build method title list
 function buildmethodlist() {
+  $("#methodsearch").val("");
+  searchval = "";
   $("#methodnamelist ul").contents().remove();
   let methodset = searchparamstuff(); //get this based on search terms
   let stagename = stagenames[searchparams.stage-4];
@@ -277,7 +279,11 @@ function searchparamstuff() {
 
 //[todo]
 function methodkeyup(e) {
-  
+  let search = $("#methodsearch").val().trim();
+  if (search != searchval) {
+    filtermethodlist(search);
+    searchval = search;
+  }
 }
 
 function filtermethodlist(value) {

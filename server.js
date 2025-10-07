@@ -65,8 +65,9 @@ fastify.get("/", function(request, reply) {
   for (let i = today.getFullYear(); i > 1949; i--) {
     params.years.push(i);
   }
+  let page = request.hostname === "factual-sugar-methods.onrender.com" ? "/src/pages/methods.hbs" : "/src/pages/myindex.hbs";
   // request.query.paramName <-- a querystring example
-  reply.view("/src/pages/myindex.hbs", params);
+  reply.view(page, params);
 });
 
 // A POST route to handle form submissions

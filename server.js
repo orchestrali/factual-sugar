@@ -56,7 +56,7 @@ fastify.get("/", function(request, reply) {
     days: [],
     visits: [],
     uri: "https://"+process.env.URI,
-    test: request.hostname === "towers.changeringing.net" ? "" : `<h4>TEST VERSION</h4>`
+    test: request.hostname === "towers.changeringing.net" ? "" : `TEST VERSION`
   };
   for (let i = 1; i <= 31; i++) {
     params.days.push(i);

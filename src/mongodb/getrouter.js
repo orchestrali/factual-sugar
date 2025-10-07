@@ -4,7 +4,7 @@ const models = ["method", "performance", "oldPerformance", "name", "bbperformanc
 module.exports = async function router(model, req) {
   if (models.includes(model)) {
     let o = {model: model+"s", query: req || {}};
-    const results = await connectsearch("./findfields.js", o);
+    const results = await connectsearch("./find.js", o);
     console.log("num results: "+results.length);
     return results;
   } else {

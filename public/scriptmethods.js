@@ -350,7 +350,7 @@ function respell(name) {
 function addmethodfromsearch() {
   let mid = $("#methodnamelist li.selected").attr("id");
   let cid = $("#colllist").val();
-  let mym = savemethods(mid, cid);
+  let mym = savemethod(mid, cid);
   if (!mym) {
     let li = $("#methodnamelist li.selected");
     let text = li.text();

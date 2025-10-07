@@ -73,6 +73,7 @@ $(function() {
   $("#collectionpanel").on("click", "td:first-child", methodclick);
   $("#methodbackcontainer").on("click", "button", backfrommethod);
   $(".arrow").on("click", dropdown);
+  $("#savemethod").on("click", addmethodtocoll);
 
   //note functions
   $("#addmethodnote").on("click", addnote);
@@ -195,6 +196,7 @@ function backfrommethod(e) {
     $("#collectionpanel").show();
   } else {
     //search
+    $("#addmethodscreen").show();
   }
 }
 
@@ -669,7 +671,20 @@ function availablecolls(ccnum) {
 
 //[todo]
 function addmethodtocoll() {
-  
+  let mid = "cc"+methodobj.ccNum;
+  let cid = $("#choosecoll").val();
+  let coll = cid === "all-my-methods" ? allmymethods : mycollections.find(o => o.id === cid);
+  let mym = savemethod(mid, cid);
+  $(`#choosecoll option[value="${cid}"]`).remove();
+  let li = `<li>${coll.title}</li>`;
+  if (!mym) {
+    $("#methodcollections").append(`<ul></ul>`);
+    let li = $("#methodnamelist li.selected");
+    let text = li.text();
+    let ntext = "✓ "+text;
+    li.text(ntext);
+  }
+  $("#methodcollections ul").append(li);
 }
 
 function bluebellchange() {

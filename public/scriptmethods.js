@@ -279,7 +279,7 @@ function searchparamstuff() {
 
 //[todo]
 function methodkeyup(e) {
-  let search = $("#methodsearch").val().trim();
+  let search = $("#methodsearch").val().trim().toLowerCase();
   if (search != searchval) {
     filtermethodlist(search);
     searchval = search;

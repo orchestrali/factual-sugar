@@ -56,6 +56,7 @@ $(function() {
 
   //method search functions
   $("#addmethods").on("click", searchmethods);
+  $("#methodclass,#methodstage").on("change", buildmethodlist);
   //$("#methodsearch").on("keyup", methodkeyup);
   $("#methodnamelist").on("click", "li", (e) => {
     $("li.selected").removeClass("selected");

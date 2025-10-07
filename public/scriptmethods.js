@@ -197,8 +197,8 @@ function backfrommethod(e) {
 function methodclick(e) {
   let cc = $(e.currentTarget).parent().attr("id");
   let from = "collection";
-  //I've only prepared limited examples here
-  if (example[cc]) {
+  
+  if (bigmethodobj[cc]) {
     $("#collectionpanel").hide();
     viewmethod(cc, from);
   }
@@ -698,7 +698,7 @@ function viewmethod(m, from) {
   let button = "backto"+from;
   $("#methodbackcontainer").append(`<button id="${button}" class="back">Back to ${from}</button>`);
   //what does "m" include? need to retrieve method info from somewhere
-  let mobj = example[m]; //detailed info
+  let mobj = bigmethodobj[m]; //detailed info
   stage = mobj.stage;
   methodobj = mobj;
   $("#methodtitle").text(mobj.title);

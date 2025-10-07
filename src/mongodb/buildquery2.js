@@ -9,9 +9,14 @@ module.exports = function buildquery(q) {
   for (let key in q) {
     let val = q[key];
     if ((val.startsWith("{") && val.endsWith("}")) || (val.startsWith("[") && val.endsWith("]"))) {
-      val = JSON.parse(val);
-    }
-    if (numbers.includes(key)) {
+      try {
+        val = JSON.parse(val);
+      } catch (error) {
+        console.log("error building query");
+        console.log(key, q[key]);
+      }
+      
+    } else if (numbers.includes(key)) {
       if (typeof val === "string") {
         query[key] = Number(val);
       } else if (Array.isArray(val)) {

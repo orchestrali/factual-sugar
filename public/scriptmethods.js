@@ -373,6 +373,7 @@ function choosecollfromsearch() {
 //mid: ccnum, cid: existing collection number
 function savemethod(mid, cid) {
   let mym = mymethods.find(o => o.ccNum === mid);
+  let trs = [cid];
   if (mym) {
     //already in mymethods
     mym.collections.push(cid);
@@ -386,13 +387,20 @@ function savemethod(mid, cid) {
       collections: [],
       id: "m"+Date.now()
     };
-    if (cid != "all-my-methods") o.collections.push(cid);
+    if (cid != "all-my-methods") {
+      o.collections.push(cid);
+      trs.push("all-my-methods");
+    }
     mymethods.push(o);
   }
-  let trtd = $("tr#"+cid + " td:nth-child(2)");
-  let num = Number(trtd.text());
-  num++;
-  trtd.text(num.toString());
+  trs.forEach(tr => {
+    let trtd = $("tr#"+tr + " td:nth-child(2)");
+    let num = Number(trtd.text());
+    num++;
+    trtd.text(num.toString());
+  });
+  
+  
   
   savelocal();
   return mym;

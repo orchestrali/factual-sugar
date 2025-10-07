@@ -105,7 +105,7 @@ $(function() {
 function getmethods() {
   $("#screens").append(`<p id="temp">Loading methods...</p>`);
   let o = {
-    fields: "title stage class ccNum pn pnFull leadsInCourse leadHeadCode leadLength",
+    fields: "title stage class ccNum pn pnFull leadsInCourse leadHeadCode leadLength huntBells",
     stage: "4;5;6;7;8;9;10;11;12"
   };
 
@@ -853,7 +853,7 @@ function drawmethod(m) {
       svg.rect(boxgroup, x, 10, 16, height-40);
     }
     let parent;
-    if (m.huntBells.includes(b)) {
+    if (m.huntBells && m.huntBells.includes(b)) {
       hunt = true;
       parent = huntgroup;
     } else if (bells.length === stage) {

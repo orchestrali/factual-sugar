@@ -1,9 +1,11 @@
 const connectsearch = require("./startconnect.js");
 const models = ["method", "performance", "oldPerformance", "name", "bbperformance", "unmethod", "variation", "call", "cycle", "leadhead", "methodab", "doublescall", "word", "bbtext"];
+const buildquery = require("./buildquery2.js");
 
 module.exports = async function router(model, req) {
   if (models.includes(model)) {
-    let o = {model: model+"s", query: req || {}};
+    let o = {model: model+"s"};
+    o.query = req ? buildquery(req) : {};
     const results = await connectsearch("./find.js", o);
     console.log("num results: "+results.length);
     return results;

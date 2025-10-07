@@ -632,6 +632,7 @@ function addnote() {
   let string = date.join(" ");
   $("#methodnoteslist").hide();
   $("#notetitle").val(string);
+  $("#note").val("");
   $("#noteeditor").show();
 }
 
@@ -698,6 +699,7 @@ function addmethodtocoll() {
   $(`#choosecoll option[value="${cid}"]`).remove();
   let li = `<li>${coll.title}</li>`;
   if (!mym) {
+    if (cid != "all-my-methods") $(`#choosecoll option[value="all-my-methods"]`).remove();
     $("#methodcollections").append(`<ul></ul>`);
     $("#methodpanel > h4:first-of-type").show();
     let li = $("#methodnamelist li.selected");

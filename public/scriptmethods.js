@@ -3,7 +3,7 @@ const places = "1234567890ETABCD";
 //need some holder for method titles
 var methodnames;
 //separate holder for detailed method info?
-var bigmethodinfo;
+var bigmethodobj;
 //holder for svg stuff
 var svg;
 //display option for methods: grid, lines
@@ -66,6 +66,8 @@ $(function() {
     $("#methodbuttons").show();
   });
   $("#viewmethod").on("click", viewfromsearch);
+  $("#addmethod").on("click", choosecollfromsearch);
+  $("#saveadd").on("click", addmethodfromsearch);
 
   //method functions
   $("#displayopts").on("change", toggledisplay);
@@ -376,7 +378,7 @@ function savemethod(mid, cid) {
     mym.collections.push(cid);
   } else {
     //get method info
-    let title = bigmethodinfo[mid].title;
+    let title = bigmethodobj[mid].title;
     let o = {
       title: title,
       notes: [],

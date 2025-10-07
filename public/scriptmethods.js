@@ -372,6 +372,8 @@ function choosecollfromsearch() {
 
 //mid: ccnum, cid: existing collection number
 function savemethod(mid, cid) {
+  console.log("saving method");
+  console.log(mid, cid);
   let mym = mymethods.find(o => o.ccNum === mid);
   let trs = [cid];
   if (mym) {
@@ -680,6 +682,7 @@ function availablecolls(ccnum) {
 }
 
 //[todo]
+//click from method view
 function addmethodtocoll() {
   let mid = "cc"+methodobj.ccNum;
   let cid = $("#choosecoll").val();
@@ -689,11 +692,14 @@ function addmethodtocoll() {
   let li = `<li>${coll.title}</li>`;
   if (!mym) {
     $("#methodcollections").append(`<ul></ul>`);
+    $("#methodpanel > h4:first-of-type").show();
     let li = $("#methodnamelist li.selected");
     let text = li.text();
     let ntext = "✓ "+text;
     li.text(ntext);
   }
+  $("#addmethodnote").show();
+  $("#methodnoteslist").show();
   $("#methodcollections ul").append(li);
 }
 

@@ -143,7 +143,7 @@ function setupuser() {
     account = localStorage.getItem("account");
     mymethods = JSON.parse(localStorage.getItem("mymethods"));
     mymethods.forEach(m => {
-      let i = m.collections.findIndex("all-my-methods");
+      let i = m.collections.indexOf("all-my-methods");
       if (i > -1) {
         m.collections.splice(i,1);
       }

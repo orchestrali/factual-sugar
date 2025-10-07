@@ -103,7 +103,7 @@ fastify.get("/methods", function(request, reply) {
 });
 
 fastify.get("/find/:model", async function(req, reply) {
-  console.log(req.query);
+  //console.log(req.query);
   const results = await mongoget(req.params.model, req.query);
   reply.send(results);
 });

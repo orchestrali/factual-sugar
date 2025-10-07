@@ -3,7 +3,7 @@ const find = require("./findfields.js");
 
 const uri = "mongodb+srv://"+process.env.USER+":"+process.env.PASS+"@cluster0.wompx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
-module.exports = async function runGetStarted(o) {
+module.exports = async function runGetStarted(path, o) {
   //console.log("attempting to connect");
   const client = new MongoClient(uri);
 
@@ -12,8 +12,9 @@ module.exports = async function runGetStarted(o) {
 
     if (o) {
       //console.log("searching");
+      let f = require(path);
       //console.log(o.query);
-      const results = await find(database, o.model, o.query);
+      const results = await f(database, o.model, o.query);
       //console.log(results.length);
       return results;
     }

@@ -176,7 +176,8 @@ function homeclick() {
 
 //return to my collections
 function homeview() {
-  $("#addmethodscreen,#collectionpanel,#methodpanel,#alert,#viewcollections").hide();
+  $("#addmethodscreen,#collectionpanel,#alert,#viewcollections").hide();
+  $("#methodpanel").addClass("hidden");
   //reset stuff
   editing = false;
   collectionedits = [];

@@ -11,6 +11,7 @@ module.exports = function buildquery(q) {
     if ((val.startsWith("{") && val.endsWith("}")) || (val.startsWith("[") && val.endsWith("]"))) {
       try {
         val = JSON.parse(val);
+        query[key] = val;
       } catch (error) {
         console.log("error building query");
         console.log(key, q[key]);

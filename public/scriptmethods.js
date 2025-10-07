@@ -74,7 +74,7 @@ $(function() {
   $("#bluebell").on("change", bluebellchange);
   $("#collectionpanel").on("click", "td:first-child", methodclick);
   $("#methodbackcontainer").on("click", "button", backfrommethod);
-  $(".arrow").on("click", dropdown);
+  $("#methodpanel > h4").on("click", dropdownclick); //.arrow clicks should bubble?
   $("#savemethod").on("click", addmethodtocoll);
 
   //note functions
@@ -812,12 +812,17 @@ function viewmethod(m, from) {
   $("#methodpanel").removeClass("hidden");
 }
 
+function dropdownclick(e) {
+  let arrow = $(e.currentTarget).hasClass("arrow") ? $(e.currentTarget) : $(e.currentTarget).children(".arrow");
+  dropdown(arrow);
+}
+
 //info panels when viewing a method
-function dropdown(e) {
-  $(e.currentTarget).toggleClass("rotate");
-  let which = $(e.currentTarget).parent().next();
+function dropdown(arrow) {
+  arrow.toggleClass("rotate");
+  let which = arrow.parent().next();
   let id = which.attr("id");
-  if ($(e.currentTarget).hasClass("rotate")) {
+  if (arrow.hasClass("rotate")) {
     let h;
     switch (id) {
       case "displayoptions":

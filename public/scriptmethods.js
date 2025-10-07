@@ -44,7 +44,7 @@ var searchval = "";
 
 
 $(function() {
-  $("#viewcollections").hide();
+  $("#viewcollections,#addmethods").hide();
   getmethods();
   $("#methodcontainer").svg({onLoad: (o) => {
     svg = o;
@@ -123,6 +123,8 @@ function getmethods() {
       bigmethodobj[small.cc] = m;
     });
     console.log("methods retrieved");
+    buildmethodlist();
+    $("#addmethods").show();
     setupuser();
   });
 }
@@ -251,7 +253,7 @@ function searchparamstuff() {
   searchparams.class = $("#methodclass option:checked").text();
   let classo = methodnames[searchparams.stage-4].classes.find(o => o.class === searchparams.class);
   if (classo) {
-    return classo.methods;
+    return classo.methods.sort((a,b) => a.title.localeCompare(b.title));
   } else {
     return [];
   }

@@ -232,6 +232,7 @@ function viewfromsearch(e) {
 
 //view collection from list
 function collclick(e) {
+  $("#addmethods").hide();
   $("#viewcollections").show();
   let cid = $(e.currentTarget).parent().attr("id");
   viewcoll(cid);

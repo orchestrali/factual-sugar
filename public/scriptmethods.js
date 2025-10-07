@@ -769,6 +769,15 @@ function viewmethod(m, from) {
         let li = `<li${c}>${coll.title}</li>`;
         ul.append(li);
       });
+      let possible = availablecolls(m);
+      if (from === "search" && possible.length) {
+        possible.forEach(c => {
+          $("#choosecoll").append(`<option value="${c.id}">${c.title}</option>`);
+        });
+        $("#addtocollection").show();
+      } else {
+        $("#addtocollection").hide();
+      }
       //display any notes
       currentmethod.notes.forEach(o => {
         $("#methodnoteslist ul").append(`<li id="n${o.id}">${o.title}</li>`);
@@ -776,7 +785,7 @@ function viewmethod(m, from) {
       //display add note button
       $("#addmethodnote").show();
     } else {
-      $("#methodpanel h4:first-of-type").hide();
+      $("#methodpanel > h4:first-of-type").hide();
       $("#choosecoll").append(`<option value="all-my-methods">All my methods</option>`);
       mycollections.forEach(c => {
         $("#choosecoll").append(`<option value="${c.id}">${c.title}</option>`);

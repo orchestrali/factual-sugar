@@ -103,6 +103,7 @@ $(function() {
 
 //get the methods!
 function getmethods() {
+  $("#screens").append(`<p id="temp">Loading methods...</p>`);
   let o = {
     fields: "title stage class ccNum pn pnFull leadsInCourse leadHeadCode leadLength",
     stage: "4;5;6;7;8;9;10;11;12"
@@ -123,9 +124,12 @@ function getmethods() {
       bigmethodobj[small.cc] = m;
     });
     console.log("methods retrieved");
-    buildmethodlist();
-    $("#addmethods").show();
+    
+    
     setupuser();
+    buildmethodlist();
+    $("#temp").remove();
+    $("#addmethods").show();
   });
 }
 
@@ -240,7 +244,7 @@ function buildmethodlist() {
   methodset.forEach((m,i) => {
     let name = m.title.slice(0,-stagename.length-1);
     let cc = m.cc;
-    let mine = mymethods.find(o => o.title === m.title);
+    let mine = mymethods ? mymethods.find(o => o.title === m.title) : null;
     if (mine) name = "✓ "+name;
     let id = cc ? cc : "um"+i;
     //if (name.endsWith(" Bob")) name = name.slice(0, -4);

@@ -13,6 +13,8 @@ var gridtype = "grid";
 var bluebellprefs = {};
 var bluebell = "auto";
 
+//holder for detailed info about mymethods
+var smallmethodobj = {};
 //hmmm possibly only establish this when logged in?
 var allmymethods = {title: "All my methods", id: "all-my-methods", position: 1};
 //email?
@@ -46,7 +48,7 @@ var searchval = "";
 
 $(function() {
   $("#viewcollections,#addmethods").hide();
-  getmethods();
+  setupgetmethods();
   $("#methodcontainer").svg({onLoad: (o) => {
     svg = o;
   }});
@@ -108,10 +110,13 @@ $(function() {
 });
 
 
-
+function setuppage() {
+  setupuser();
+  //show info if new user?
+}
 
 //get the methods!
-function getmethods() {
+function setupgetmethods() {
   $("#screens").append(`<p id="temp">Loading methods...</p>`);
   let o = {
     fields: "title stage class ccNum pn pnFull leadsInCourse leadHeadCode",
@@ -119,6 +124,7 @@ function getmethods() {
   };
 
   $.post("/find/method", o, (mm) => {
+    console.log("methods retrieved");
     bigmethodobj = {};
     methodnames = [{stage: 4, classes: []},{stage: 5, classes: []},{stage: 6, classes: []},{stage: 7, classes: []},{stage: 8, classes: []}, {stage: 9, classes: []}, {stage: 10, classes: []}, {stage: 11, classes: []}, {stage: 12, classes: []}];
     mm.forEach(m => {
@@ -133,7 +139,7 @@ function getmethods() {
       }
       bigmethodobj[small.cc] = m;
     });
-    console.log("methods retrieved");
+    
     
     
     setupuser();
@@ -151,6 +157,9 @@ function setupuser() {
     mymethods = JSON.parse(localStorage.getItem("mymethods"));
     
     mycollections = JSON.parse(localStorage.getItem("mycollections"));
+    if (localStorage.getItem("smallmethodobj")) {
+      smallmethodobj = JSON.parse(localStorage.getItem("smallmethodobj"));
+    }
     tempcleanup();
   } else {
     account = "accountname";
@@ -160,6 +169,36 @@ function setupuser() {
   buildcollections();
 }
 
+function getmethods() {
+  $("#screens").append(`<p id="temp">Loading methods...</p>`);
+  let o = {
+    fields: "title stage class ccNum pn pnFull leadsInCourse leadHeadCode",
+    stage: "4;5;6;7;8;9;10;11;12"
+  };
+
+  $.post("/find/method", o, (mm) => {
+    console.log("methods retrieved");
+    bigmethodobj = {};
+    methodnames = [{stage: 4, classes: []},{stage: 5, classes: []},{stage: 6, classes: []},{stage: 7, classes: []},{stage: 8, classes: []}, {stage: 9, classes: []}, {stage: 10, classes: []}, {stage: 11, classes: []}, {stage: 12, classes: []}];
+    mm.forEach(m => {
+      let small = {title: m.title, cc: "cc"+m.ccNum};
+      m.leadLength = m.pnFull.length;
+      let stageo = methodnames[m.stage-4];
+      let co = stageo.classes.find(obj => obj.class === m.class);
+      if (co) {
+        co.methods.push(small);
+      } else {
+        stageo.classes.push({class: m.class, methods: [small]});
+      }
+      bigmethodobj[small.cc] = m;
+    });
+
+    buildmethodlist();
+    $("#temp").remove();
+    $("#addmethods").show();
+  });
+}
+
 //changes to how localstorage items need to be structured
 function tempcleanup() {
   mymethods.forEach(m => {
@@ -167,17 +206,21 @@ function tempcleanup() {
     if (i > -1) {
       m.collections.splice(i,1);
     }
+    let obj = bigmethodobj[m.id];
+    smallmethodobj[m.id] = obj;
   });
   if (mycollections.length && !mycollections[0].position) {
     mycollections.forEach((c,i) => c.position = i+2);
   }
-  
+  savelocal();
 }
 
 function savelocal() {
   localStorage.setItem("account", account);
   localStorage.setItem("mymethods", JSON.stringify(mymethods));
   localStorage.setItem("mycollections", JSON.stringify(mycollections));
+  //this one might stay in local storage? or when retrieving user data, get detailed info about just the methods in their collections
+  localStorage.setItem("smallmethodobj", JSON.stringify(smallmethodobj));
 }
 
 
@@ -210,7 +253,8 @@ function homeview() {
   currentmethod = null;
   currentcollection = null;
   currentnote = null;
-  $("#collectionlist,#addmethods").show();
+  $("#collectionlist").show();
+  if (bigmethodobj) $("#addmethods").show();
 }
 
 function backfrommethod(e) {
@@ -230,7 +274,7 @@ function methodclick(e) {
   let cc = $(e.currentTarget).parent().attr("id");
   let from = "collection";
   
-  if (bigmethodobj[cc]) {
+  if (smallmethodobj[cc]) {
     $("#collectionpanel").hide();
     viewmethod(cc, from);
   }
@@ -401,6 +445,7 @@ function choosecollfromsearch() {
   $("#addingdiv").removeClass("hidden");
 }
 
+//save a method to a collection
 //mid: ccnum, cid: existing collection number
 function savemethod(mid, cid) {
   console.log("saving method");
@@ -425,6 +470,7 @@ function savemethod(mid, cid) {
       trs.push("all-my-methods");
     }
     mymethods.push(o);
+    smallmethodobj[mid] = bigmethodobj[mid];
   }
   trs.forEach(tr => {
     let trtd = $("tr#"+tr + " td:nth-child(2)");
@@ -523,27 +569,6 @@ function removecoll(e) {
   //probably want a dialog to confirm deletion
 }
 
-function viewcoll(cid) {
-  let cmethods = cid === "all-my-methods" ? mymethods : mymethods.filter(m => m.collections.includes(cid));
-  currentcollection = cid === "all-my-methods" ? allmymethods : mycollections.find(c => c.id === cid);
-  sortby = currentcollection.sort || "title";
-  $(`#collsort input[value="${sortby}"]`).prop("checked", true);
-  cmethods.sort(sortmethods);
-  
-  $("#collectionpanel h3").text(currentcollection.title);
-  $("#titleedit").val(currentcollection.title);
-  let tbody = $("#collectionpanel tbody");
-  tbody.contents().remove();
-  
-  cmethods.forEach(m => {
-    let tr = `<tr id="${m.ccNum}"><td class="method">${m.title}</td><td class="edit"><button class="remove">-</button></td></tr>`;
-    tbody.append(tr);
-  });
-  
-  $("#collectionpanel .edit").hide();
-  $("#collectionlist").hide();
-  $("#collectionpanel").show();
-}
 
 function addemptycoll() {
   $("#newcollection").hide();
@@ -578,6 +603,28 @@ function cancelemptycoll() {
 
 
 // ***** viewing/editing a collection *****
+
+function viewcoll(cid) {
+  let cmethods = cid === "all-my-methods" ? mymethods : mymethods.filter(m => m.collections.includes(cid));
+  currentcollection = cid === "all-my-methods" ? allmymethods : mycollections.find(c => c.id === cid);
+  sortby = currentcollection.sort || "title";
+  $(`#collsort input[value="${sortby}"]`).prop("checked", true);
+  cmethods.sort(sortmethods);
+  
+  $("#collectionpanel h3").text(currentcollection.title);
+  $("#titleedit").val(currentcollection.title);
+  let tbody = $("#collectionpanel tbody");
+  tbody.contents().remove();
+  
+  cmethods.forEach(m => {
+    let tr = `<tr id="${m.ccNum}"><td class="method">${m.title}</td><td class="edit"><button class="remove">-</button></td></tr>`;
+    tbody.append(tr);
+  });
+  
+  $("#collectionpanel .edit").hide();
+  $("#collectionlist").hide();
+  $("#collectionpanel").show();
+}
 
 //start editing a collection
 function editcollection() {
@@ -615,7 +662,7 @@ function cancelcolledits() {
   editing = false;
   collectionedits = [];
   //viewcoll will hide the edit stuff but won't show currently hidden things
-  $("#editcollection,#sortcoll").show();
+  $("#editcollection,#collsort").show();
   viewcoll(currentcollection.id);
 }
 
@@ -834,7 +881,7 @@ function viewmethod(m, from) {
   let button = "backto"+from;
   $("#methodbackcontainer").append(`<button id="${button}" class="back">Back to ${from}</button>`);
   //what does "m" include? need to retrieve method info from somewhere
-  let mobj = bigmethodobj[m]; //detailed info
+  let mobj = bigmethodobj ? bigmethodobj[m] : smallmethodobj[m]; //detailed info
   stage = mobj.stage;
   methodobj = mobj;
   $("#methodtitle").text(mobj.title);

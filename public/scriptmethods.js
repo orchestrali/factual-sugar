@@ -14,12 +14,13 @@ var bluebellprefs = {};
 var bluebell = "auto";
 
 //hmmm possibly only establish this when logged in?
-const allmymethods = {title: "All my methods", id: "all-my-methods"};
+var allmymethods = {title: "All my methods", id: "all-my-methods", position: 1};
 //email?
 var account;
 //methods need: title, notes (array), collections (array of ids), id (m+date added), ccNum
 var mymethods;
 //collections are just title and id
+//adding: position (in list of collections), sort (within collection), notes
 var mycollections;
 
 //method object from mymethods
@@ -88,16 +89,21 @@ $(function() {
   $("#editnote").on("click", editnote);
   $("#notetitle").on("keyup", notetitlekeyup);
 
-  //collection functions
+  //collection list functions
   $("#collectionlist").on("click", "td.collection", collclick);
   $("#colltitle,#titleedit").on("keyup", colltitlekeyup);
   $("#newcollection").on("click", () => $("#newcollpanel").removeClass("hidden"));
   $("#savecoll").on("click", savenewcoll);
+  $("#collectionlist").on("click", ".remove", removecoll); //not functional yet
+  $("#collectionlist").on("change", ".cposition", movecoll);
+  $("#collectionlist").on("click", ".movecoll", bumpcoll);
+  $("#collectionlist").on("click", ".cancelcollmove", cancelcollmove);
+  //single collection functions
   $("#editcollection").on("click", editcollection);
   $("#cancelcolledits").on("click", cancelcolledits);
   $("#collectionpanel").on("click", ".remove", removecollmethod);
   $("#savecolledits").on("click", savecolledits);
-  $("#collectionlist").on("click", ".remove", removecoll); //not functional yet
+  $('input[name="sort"]').on("change", changecollsort);
   
 });
 
@@ -108,7 +114,7 @@ $(function() {
 function getmethods() {
   $("#screens").append(`<p id="temp">Loading methods...</p>`);
   let o = {
-    fields: "title stage class ccNum pn pnFull leadsInCourse leadHeadCode leadLength huntBells",
+    fields: "title stage class ccNum pn pnFull leadsInCourse leadHeadCode",
     stage: "4;5;6;7;8;9;10;11;12"
   };
 
@@ -117,6 +123,7 @@ function getmethods() {
     methodnames = [{stage: 4, classes: []},{stage: 5, classes: []},{stage: 6, classes: []},{stage: 7, classes: []},{stage: 8, classes: []}, {stage: 9, classes: []}, {stage: 10, classes: []}, {stage: 11, classes: []}, {stage: 12, classes: []}];
     mm.forEach(m => {
       let small = {title: m.title, cc: "cc"+m.ccNum};
+      m.leadLength = m.pnFull.length;
       let stageo = methodnames[m.stage-4];
       let co = stageo.classes.find(obj => obj.class === m.class);
       if (co) {
@@ -142,19 +149,29 @@ function setupuser() {
   if (localStorage.getItem("account")) {
     account = localStorage.getItem("account");
     mymethods = JSON.parse(localStorage.getItem("mymethods"));
-    mymethods.forEach(m => {
-      let i = m.collections.indexOf("all-my-methods");
-      if (i > -1) {
-        m.collections.splice(i,1);
-      }
-    });
+    
     mycollections = JSON.parse(localStorage.getItem("mycollections"));
+    tempcleanup();
   } else {
     account = "accountname";
     mymethods = [];
     mycollections = [];
   }
   buildcollections();
+}
+
+//changes to how localstorage items need to be structured
+function tempcleanup() {
+  mymethods.forEach(m => {
+    let i = m.collections.indexOf("all-my-methods");
+    if (i > -1) {
+      m.collections.splice(i,1);
+    }
+  });
+  if (mycollections.length && !mycollections[0].position) {
+    mycollections.forEach((c,i) => c.position = i+2);
+  }
+  
 }
 
 function savelocal() {
@@ -330,7 +347,7 @@ function checkname(name, val) {
 function respell(name) {
   //'.()!-?&,£="/₃₁²™
   //éèëøůáčöåòùûàóìäúñṟāêæâîü
-  let lstr = "áàäâāåčçéèëêēe̊íìïîīñóòöôōo̊øṟřšśúùüûūůæ₃₁²™";
+  let lstr = "áàäâāåčçéèëêēe̊íìïîīñóòöôōo̊øṟřšśúùüûūůæ₃₁²™′’";
   let letters = {
     a: "áàäâāå",
     ae: "æ",
@@ -346,6 +363,7 @@ function respell(name) {
     "1": "₁",
     "2": "²",
     "3": "₃",
+    "'": "′’"
   };
   let alt = "";
   for (let i = 0; i < name.length; i++) {
@@ -429,21 +447,77 @@ function savemethod(mid, cid) {
 function buildcollections() {
   if (account) {
     let tbody = $("#collectionlist tbody");
-    //add base collection
-    let tr = `<tr id="all-my-methods"><td class="collection">All my methods</td><td>${mymethods.length}</td></tr>`;
-    tbody.append(tr);
-    //add others
-    mycollections.forEach(c => {
-      let num = mymethods.filter(m => m.collections.includes(c.id)).length;
-      let row = `<tr id="${c.id}"><td class="collection">${c.title}</td><td>${num}</td><td><button class="remove">-</button></td></tr>`;
+
+    let move = `<select class="cposition">`;
+    for (let i = 1; i <= mycollections.length+1; i++) {
+      move += `<option>${i}</option>`;
+    }
+    move += `</select>`;
+    
+    //add collections in saved position order
+    for (let i = 1; i <= mycollections.length+1; i++) {
+      let c = mycollections.find(o => o.position === i);
+      if (!c) c = allmymethods;
+      let num = c.id === "all-my-methods" ? mymethods.length : mymethods.filter(m => m.collections.includes(c.id)).length;
+      let last = c.id === "all-my-methods" ? "" : `<td><button class="remove">-</button></td>`;
+      let row = `<tr id="${c.id}"><td class="collection">${c.title}</td><td>${num}</td><td>${move}</td>${last}</tr>`;
       tbody.append(row);
-    });
+      $("#collectionlist tr:last-child .cposition option:nth-child("+i+")").prop("selected", true);
+    }
   } else {
     //display log in option
     //do I even need this, it's probably a top level thing
   }
 }
 
+//cancel moving a collection within the collection list
+function cancelcollmove(e) {
+  let i = $(".cancelcollmove").parent().parent().index()+1;
+  $("#collectionlist tbody tr:nth-child("+i+") option:nth-child("+i+")").prop("selected", true);
+  $(".movecoll,.cancelcollmove").remove();
+  $(".cposition").prop("disabled", false);
+}
+
+//change collection position dropdown selection
+function movecoll(e) {
+  $(e.currentTarget).after(`<button class="movecoll">Go</button><button class="cancelcollmove">Cancel</button>`);
+  $(".cposition").prop("disabled", true);
+}
+
+//actually move collection to a new position
+//update other collection positions as needed
+function bumpcoll(e) {
+  let npos = Number($(e.currentTarget).prevAll("select").children("option:checked").text());
+  let oldpos = $(e.currentTarget).parent().parent().index()+1;
+  //console.log(npos);
+  
+  //direction to move other rows
+  let dir = oldpos > npos ? 1 : -1;
+  let start = Math.min(npos, oldpos);
+  let end = Math.max(npos, oldpos);
+  for (let i = start; i <= end; i++) {
+    let c = mycollections.find(o => o.position === i);
+    if (!c) c = allmymethods;
+    let movedpos = i+dir;
+    if (i === oldpos) {
+      movedpos = npos;
+      let tr = $("#collectionlist tbody tr:nth-child("+i+")").detach();
+      let j = npos-1;
+      $("#collectionlist tbody tr:nth-child("+j+")").after(tr);
+      c.position = npos;
+    } else {
+      c.position += dir;
+    }
+  }
+  $("#collectionlist tbody tr").each((i,e) => {
+    let n = i+1;
+    $(e).find(".cposition option:nth-child("+n+")").prop("selected", true);
+  });
+  $(".movecoll,.cancelcollmove").remove();
+  $(".cposition").prop("disabled", false);
+}
+
+//[todo]
 function removecoll(e) {
   let cid = $(e.currentTarget).parent().parent().attr("id");
   //probably want a dialog to confirm deletion
@@ -451,8 +525,10 @@ function removecoll(e) {
 
 function viewcoll(cid) {
   let cmethods = cid === "all-my-methods" ? mymethods : mymethods.filter(m => m.collections.includes(cid));
-  cmethods.sort(sortmethods);
   currentcollection = cid === "all-my-methods" ? allmymethods : mycollections.find(c => c.id === cid);
+  sortby = currentcollection.sort || "title";
+  $(`#collsort input[value="${sortby}"]`).prop("checked", true);
+  cmethods.sort(sortmethods);
   
   $("#collectionpanel h3").text(currentcollection.title);
   $("#titleedit").val(currentcollection.title);
@@ -499,12 +575,14 @@ function cancelemptycoll() {
   $("#newcollerror").text("");
 }
 
-//editing a collection
+
+
+// ***** viewing/editing a collection *****
 
 //start editing a collection
 function editcollection() {
   //editing = true;
-  $("#editcollection").hide();
+  $("#editcollection,#collsort").hide();
   $("#collectionpanel .edit").show();
 }
 
@@ -537,7 +615,7 @@ function cancelcolledits() {
   editing = false;
   collectionedits = [];
   //viewcoll will hide the edit stuff but won't show currently hidden things
-  $("#editcollection").show();
+  $("#editcollection,#sortcoll").show();
   viewcoll(currentcollection.id);
 }
 
@@ -572,6 +650,13 @@ function checkcolltitle(title, edit) {
     err = "collection title already in use";
   }
   return err;
+}
+
+function changecollsort(e) {
+  let sort = $(e.currentTarget).val();
+  //console.log(sort);
+  currentcollection.sort = sort;
+  viewcoll(currentcollection.id);
 }
 
 function sortmethods(a,b) {
@@ -759,10 +844,16 @@ function viewmethod(m, from) {
   
   buildrowarr();
   let lh = rowstring(rowarr[mobj.leadLength]);
+  mobj.huntBells = [];
+  for (let i = 0; i < stage; i++) {
+    if (lh[i] === places[i]) mobj.huntBells.push(i+1);
+  }
   if (mobj.leadHeadCode) {
     lh += " (code "+mobj.leadHeadCode+")";
   }
   info.append(`<li>Leadhead: ${lh}</li>`);
+  let link = `<a href="https://complib.org/method/${m.slice(2)}" target="blank">View on complib.org</a>`;
+  info.append(`<li>${link}</li>`);
   //need to save bluebell choice and reapply it
   $("#bluebell").html(bluebellopts(stage));
   $('#bluebell').val(bluebell);
@@ -834,15 +925,15 @@ function dropdown(arrow) {
       case "displayoptions":
         h = gridtype === "grid" ? "4em" : "6em";
         break;
-      case "methodcollections":
+      case "methodcollections": case "methodinfobox":
         let n = which.find("li").length;
         h = (n+2) + "em";
         break;
-      case "methodinfobox":
+      
         //might need to copy methodcollections when I'm showing more properties
         //also need to deal with/stop wrapping
-        h = "4em";
-        break;
+        //h = "4em";
+        //break;
     }
     which.css("height", h);
   } else {

@@ -7,6 +7,10 @@ button:hover {
   cursor: pointer;
 }
 
+label {
+  display: inline-block;
+}
+
 li.selected {
   background-color: lightblue;
 }
@@ -68,6 +72,9 @@ td:first-child:hover {
 }
 
 
+#collsort label {
+  margin-right: 7px;
+}
 
 #alert {
   max-width: 300px;

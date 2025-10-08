@@ -206,8 +206,8 @@ function tempcleanup() {
     if (i > -1) {
       m.collections.splice(i,1);
     }
-    let obj = bigmethodobj[m.id];
-    smallmethodobj[m.id] = obj;
+    let obj = bigmethodobj[m.ccNum];
+    smallmethodobj[m.ccNum] = obj;
   });
   if (mycollections.length && !mycollections[0].position) {
     mycollections.forEach((c,i) => c.position = i+2);

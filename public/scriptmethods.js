@@ -201,6 +201,7 @@ function getmethods() {
 
 //changes to how localstorage items need to be structured
 function tempcleanup() {
+  smallmethodobj = {};
   mymethods.forEach(m => {
     let i = m.collections.indexOf("all-my-methods");
     if (i > -1) {

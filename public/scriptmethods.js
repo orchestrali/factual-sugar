@@ -51,7 +51,7 @@ var searchval = "";
 
 
 $(function() {
-  $("#viewcollections,#addmethods,#loadmethods").hide();
+  $(".loadmethods,#overlay,#addmethods").hide();
   setupuser();
   $("#methodcontainer").svg({onLoad: (o) => {
     svg = o;
@@ -59,7 +59,7 @@ $(function() {
 
   //big button clicks
   $("#abandon").on("click", homeview);
-  $("#viewcollections").on("click", homeclick);
+  $(".viewcollections").on("click", homeclick);
   $("#stayonpage").on("click", () => $("#alert").hide());
   $("#loadmethods").on("click", showloadmethods);
 
@@ -121,6 +121,7 @@ function setuppage() {
 }
 
 function showloadmethods() {
+  $("#overlay").show();
   let opts = `Method stages to load: `;
   for (let i = 3; i <= 16; i++) {
     let check = [5,6,7,8].includes(i) ? "checked" : "";
@@ -129,23 +130,27 @@ function showloadmethods() {
       opts += `<label><input type="checkbox" class="stage" value="${s}" ${check}/>${s}</label>`;
     }
   }
-  opts += `<button id="fetchmethods">Go</button>`;
-  $("#screens").append(`<div id="loadstages"></div>`);
+  opts += `<button id="fetchmethods">Go</button>
+  <button id="cancelfetch">Cancel</button></p>`;
+  $("#loadingcontainer").append(`<div id="loadstages"><h3>Load methods</h3></div>`);
   
-  $("#loadstages").html(opts);
+  $("#loadstages").append(opts);
   $("#fetchmethods").on("click", loadmethodsclick);
+  $("#cancelfetch").on("click", cancelmethodload);
 }
 
 function loadmethodsclick() {
   let stages = [];
   $("input.stage:checked").each((i,e) => stages.push($(e).val()));
-  cancelmethodload();
+  $("#loadstages").remove();
+  $("#loadingcontainer").append(`<p id="temp">Loading methods...</p>`);
 
   getmethods(stages.join(";"));
 }
 
 function cancelmethodload() {
   $("#loadstages").remove();
+  $("#overlay").hide();
 }
 
 //old function where I always started by fetching methods
@@ -201,19 +206,17 @@ function setupuser() {
     mycollections = [];
   }
   buildcollections();
-  $("#loadmethods").show();
+  $(".loadmethods").show();
 }
 
 //
 function getmethods(stages) {
-  $("#screens").append(`<p id="temp">Loading methods...</p>`);
   let o = {
     fields: "title stage class ccNum pn pnFull leadsInCourse leadHeadCode",
     stage: stages
   };
   //prevent stuff while searching
-  $("#viewcollections,#addmethods,#methodnamelist,#loadmethods,#collectionlist").hide();
-  $("#methodstage,#methodclass,#methodsearch").prop("disabled", true);
+  //doing this with the overlay
 
   $.post("/find/method", o, (mm) => {
     console.log("methods retrieved");
@@ -249,10 +252,10 @@ function getmethods(stages) {
     });
     buildmethodlist();
     $("#temp").remove();
-    $("#methodstage,#methodclass,#methodsearch").prop("disabled", false);
-    if (currentscreen === "collectionlist") $("#addmethods,#collectionlist").show();
-    if (stagesloaded.length < 14) $("#loadmethods").show();
-    if (currentscreen === "addmethodscreen") $("#viewcollections").show();
+    
+    if (stagesloaded.length < 14) $(".loadmethods").show();
+    $("#addmethods").show();
+    $("#overlay").hide();
   });
 }
 
@@ -285,13 +288,28 @@ function savelocal() {
 
 // ***** moving between screens?? *****
 
+function changescreen() {
+  $(".screen,#alert").hide();
+  //cancel things??
+  $("#"+currentscreen).show();
+}
+
+//[todo]
+function cancelthings() {
+  //collection edits (may be handling this already)
+  //new (empty) collection
+  //collection move (within list)
+  //new note
+  //editing note
+  //loading methods (may already be done)
+  
+}
+
 //search screen
 function searchmethods() {
-  cancelmethodload();
   currentscreen = "addmethodscreen";
-  $("#collectionlist,#collectionpanel,#addmethods").hide();
-  $("#methodpanel").addClass("hidden");
-  $("#addmethodscreen,#viewcollections").show();
+  $("#collectionlist").hide();
+  $("#addmethodscreen").show();
 }
 
 //attempt to return to my collections
@@ -305,27 +323,22 @@ function homeclick() {
 
 //return to my collections
 function homeview() {
-  cancelmethodload();
   currentscreen = "collectionlist";
-  $("#addmethodscreen,#collectionpanel,#alert,#viewcollections").hide();
-  $("#methodpanel").addClass("hidden");
+  
   //reset stuff
   editing = false;
   collectionedits = [];
   currentmethod = null;
   currentcollection = null;
   currentnote = null;
-  $("#collectionlist").show();
-  if (bigmethodobj) $("#addmethods").show();
+  changescreen();
 }
 
 function backfrommethod(e) {
   let what = $(e.currentTarget).attr("id").slice(6);
-  $("#methodpanel").addClass("hidden");
   currentmethod = null;
   currentscreen = what === "collection" ? "collectionpanel" : "addmethodscreen";
-  $("#"+currentscreen).show();
-  
+  changescreen();
 }
 
 //from within a collection
@@ -333,29 +346,23 @@ function methodclick(e) {
   let cc = $(e.currentTarget).parent().attr("id");
   let from = "collection";
   
-  if (smallmethodobj[cc]) {
-    $("#collectionpanel").hide();
+  if (smallmethodobj[cc] && !editing) {
     viewmethod(cc, from);
   }
 }
 
 //view method via search
 function viewfromsearch(e) {
-  cancelmethodload();
   let id = $("#methodnamelist li.selected").attr("id");
   let from = "search";
   
   if (id.startsWith("cc")) {
-    $("#addmethodscreen").hide();
     viewmethod(id, from);
   }
 }
 
 //view collection from list
 function collclick(e) {
-  cancelmethodload();
-  $("#addmethods").hide();
-  $("#viewcollections").show();
   let cid = $(e.currentTarget).parent().attr("id");
   viewcoll(cid);
 }
@@ -394,8 +401,6 @@ function buildmethodlist() {
 }
 
 function searchparamstuff() {
-  cancelmethodload();
-  
   searchparams.stage = Number($("#methodstage option:checked").val());
   searchparams.class = $("#methodclass option:checked").text();
   let stageo = methodnames.find(o => o.stage === searchparams.stage);
@@ -417,9 +422,8 @@ function searchparamstuff() {
   
 }
 
-//[todo]
+//
 function methodkeyup(e) {
-  cancelmethodload();
   let search = $("#methodsearch").val().trim().toLowerCase();
   if (search != searchval) {
     filtermethodlist(search);
@@ -558,8 +562,6 @@ function savemethod(mid, cid) {
     num++;
     trtd.text(num.toString());
   });
-  
-  
   
   savelocal();
   return mym;
@@ -703,8 +705,7 @@ function viewcoll(cid) {
   });
   
   $("#collectionpanel .edit").hide();
-  $("#collectionlist").hide();
-  $("#collectionpanel").show();
+  changescreen();
 }
 
 //start editing a collection
@@ -1035,7 +1036,7 @@ function viewmethod(m, from) {
     }
     //option to add method to a collection
   }
-  $("#methodpanel").removeClass("hidden");
+  changescreen();
 }
 
 function dropdownclick(e) {

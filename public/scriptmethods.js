@@ -148,7 +148,7 @@ function cancelmethodload() {
   $("#loadstages").remove();
 }
 
-//get the methods!
+//old function where I always started by fetching methods
 function setupgetmethods() {
   $("#screens").append(`<p id="temp">Loading methods...</p>`);
   let o = {
@@ -204,6 +204,7 @@ function setupuser() {
   $("#loadmethods").show();
 }
 
+//
 function getmethods(stages) {
   $("#screens").append(`<p id="temp">Loading methods...</p>`);
   let o = {
@@ -211,7 +212,7 @@ function getmethods(stages) {
     stage: stages
   };
   //prevent stuff while searching
-  $("#viewcollections,#addmethods,#methodnamelist,#loadmethods").hide();
+  $("#viewcollections,#addmethods,#methodnamelist,#loadmethods,#collectionlist").hide();
   $("#methodstage,#methodclass,#methodsearch").prop("disabled", true);
 
   $.post("/find/method", o, (mm) => {
@@ -249,7 +250,7 @@ function getmethods(stages) {
     buildmethodlist();
     $("#temp").remove();
     $("#methodstage,#methodclass,#methodsearch").prop("disabled", false);
-    if (currentscreen === "collectionlist") $("#addmethods").show();
+    if (currentscreen === "collectionlist") $("#addmethods,#collectionlist").show();
     if (stagesloaded.length < 14) $("#loadmethods").show();
     if (currentscreen === "addmethodscreen") $("#viewcollections").show();
   });
@@ -372,32 +373,48 @@ function buildmethodlist() {
   $("#methodnamelist ul").contents().remove();
   let methodset = searchparamstuff(); //get this based on search terms
   let stagename = stagenames[searchparams.stage-3];
-  if (methodset.length === 0) {
-    $("#methodnamelist ul").append(`<li>No ${searchparams.class} ${stagename} methods exist!</li>`);
-    $("#methodsearch").prop("disabled", true);
+  if (!methodset) {
+    $("#methodnamelist ul").append(`<li>problem</li>`);
+  } else {
+    if (methodset.length === 0) {
+      $("#methodnamelist ul").append(`<li>No ${searchparams.class} ${stagename} methods exist!</li>`);
+      $("#methodsearch").prop("disabled", true);
+    }
+    
+    methodset.forEach((m,i) => {
+      let name = m.title.slice(0,-stagename.length-1);
+      let cc = m.cc;
+      let mine = mymethods ? mymethods.find(o => o.title === m.title) : null;
+      if (mine) name = "✓ "+name;
+      let id = cc ? cc : "um"+i;
+      //if (name.endsWith(" Bob")) name = name.slice(0, -4);
+      $("#methodnamelist ul").append(`<li id="${id}">${name}</li>`);
+    });
   }
-  
-  methodset.forEach((m,i) => {
-    let name = m.title.slice(0,-stagename.length-1);
-    let cc = m.cc;
-    let mine = mymethods ? mymethods.find(o => o.title === m.title) : null;
-    if (mine) name = "✓ "+name;
-    let id = cc ? cc : "um"+i;
-    //if (name.endsWith(" Bob")) name = name.slice(0, -4);
-    $("#methodnamelist ul").append(`<li id="${id}">${name}</li>`);
-  });
 }
 
 function searchparamstuff() {
   cancelmethodload();
-  searchparams.stage = Number($("#methodstage").val());
+  
+  searchparams.stage = Number($("#methodstage option:checked").val());
   searchparams.class = $("#methodclass option:checked").text();
-  let classo = methodnames.find(o => o.stage === searchparams.stage).classes.find(o => o.class === searchparams.class);
-  if (classo) {
-    return classo.methods.sort((a,b) => a.title.localeCompare(b.title));
+  let stageo = methodnames.find(o => o.stage === searchparams.stage);
+  if (!stageo) {
+    //error
+    //[todo]
+    console.log("error with search stage?");
+    console.log(searchparams);
+    console.log(stagesloaded);
+    return null;
   } else {
-    return [];
+    let classo = stageo.classes.find(o => o.class === searchparams.class);
+    if (classo) {
+      return classo.methods.sort((a,b) => a.title.localeCompare(b.title));
+    } else {
+      return [];
+    }
   }
+  
 }
 
 //[todo]

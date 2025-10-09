@@ -20,15 +20,18 @@
       <p>You have unsaved changes! Abandon them?</p>
       <button id="abandon">Yes</button><button id="stayonpage">No, stay on this page</button>
     </div>
+    <!-- about button? or dialog? where do I put the other? -->
+    <div id="about"></div>
 
-    <div id="screens">
-      <button class="large" id="viewcollections">My collections</button>
-      <button class="large" id="addmethods">Search methods</button>
-      <button class="large" id="loadmethods">Load methods to search</button>
-      <!-- add "about" button here -->
-    </div>
+    <div id="overlay"></div>
+    <div id="loadingcontainer"></div>
 
     <div id="addmethodscreen" style="display:none;">
+      <div class="container">
+        <button class="large viewcollections">My collections</button>
+        <button class="large loadmethods">Load more methods</button>
+      </div>
+      <h3>Explore methods</h3>
       <div>
         <select id="methodclass">
           <option>Bob</option>
@@ -75,6 +78,12 @@
     </div>
 
     <div id="collectionlist">
+      <div class="container">
+        <button class="large" id="addmethods">Explore methods</button>
+        <button class="large loadmethods">Load methods to explore</button>
+      </div>
+      <!-- this part needs to change for real version - login stuff -->
+      <h3>My collections</h3>
       <table class="sortable">
         <thead><th>Collection</th><th>Methods</th></thead>
         <tbody>
@@ -90,7 +99,9 @@
     </div>
 
     <div id="collectionpanel" style="display:none;">
-      <!--back to list button? or is that just at the top all the time?-->
+      <div class="container">
+        <button class="large viewcollections">My collections</button>
+      </div>
       <button id="editcollection">Edit collection</button>
       <span id="collsort">Sort by: <label><input type="radio" name="sort" value="title" />method title</label><label><input type="radio" name="sort" value="added" />date added</label></span>
       <button id="cancelcolledits" class="edit">Cancel</button>
@@ -106,7 +117,10 @@
       </table>
     </div>
 
-    <div id="methodpanel" class="hidden">
+    <div id="methodpanel" style="display:none;">
+      <div class="container">
+        <button class="large viewcollections">My collections</button>
+      </div>
       <div id="methodbackcontainer"></div>
       <h3 id="methodtitle">
         

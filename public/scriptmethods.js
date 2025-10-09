@@ -4,6 +4,8 @@ const places = "1234567890ETABCD";
 var methodnames;
 //separate holder for detailed method info?
 var bigmethodobj;
+// holder for record of loaded method stages
+var stagesloaded = [];
 //holder for svg stuff
 var svg;
 //display option for methods: grid, lines
@@ -25,6 +27,8 @@ var mymethods;
 //adding: position (in list of collections), sort (within collection), notes
 var mycollections;
 
+//possible: collectionlist, collectionpanel, methodpanel, addmethodscreen
+var currentscreen = "collectionlist";
 //method object from mymethods
 var currentmethod;
 var currentcollection;
@@ -47,8 +51,8 @@ var searchval = "";
 
 
 $(function() {
-  $("#viewcollections,#addmethods").hide();
-  setupgetmethods();
+  $("#viewcollections,#addmethods,#loadmethods").hide();
+  setupuser();
   $("#methodcontainer").svg({onLoad: (o) => {
     svg = o;
   }});
@@ -57,6 +61,7 @@ $(function() {
   $("#abandon").on("click", homeview);
   $("#viewcollections").on("click", homeclick);
   $("#stayonpage").on("click", () => $("#alert").hide());
+  $("#loadmethods").on("click", showloadmethods);
 
   //method search functions
   $("#addmethods").on("click", searchmethods);
@@ -115,6 +120,34 @@ function setuppage() {
   //show info if new user?
 }
 
+function showloadmethods() {
+  let opts = `Method stages to load: `;
+  for (let i = 3; i <= 16; i++) {
+    let check = [5,6,7,8].includes(i) ? "checked" : "";
+    let s = i.toString();
+    if (!stagesloaded.includes(i)) {
+      opts += `<label><input type="checkbox" class="stage" value="${s}" ${check}/>${s}</label>`;
+    }
+  }
+  opts += `<button id="fetchmethods">Go</button>`;
+  $("#screens").append(`<div id="loadstages"></div>`);
+  
+  $("#loadstages").html(opts);
+  $("#fetchmethods").on("click", loadmethodsclick);
+}
+
+function loadmethodsclick() {
+  let stages = [];
+  $("input.stage:checked").each((i,e) => stages.push($(e).val()));
+  cancelmethodload();
+
+  getmethods(stages.join(";"));
+}
+
+function cancelmethodload() {
+  $("#loadstages").remove();
+}
+
 //get the methods!
 function setupgetmethods() {
   $("#screens").append(`<p id="temp">Loading methods...</p>`);
@@ -125,6 +158,7 @@ function setupgetmethods() {
 
   $.post("/find/method", o, (mm) => {
     console.log("methods retrieved");
+    
     bigmethodobj = {};
     methodnames = [{stage: 4, classes: []},{stage: 5, classes: []},{stage: 6, classes: []},{stage: 7, classes: []},{stage: 8, classes: []}, {stage: 9, classes: []}, {stage: 10, classes: []}, {stage: 11, classes: []}, {stage: 12, classes: []}];
     mm.forEach(m => {
@@ -167,23 +201,35 @@ function setupuser() {
     mycollections = [];
   }
   buildcollections();
+  $("#loadmethods").show();
 }
 
-function getmethods() {
+function getmethods(stages) {
   $("#screens").append(`<p id="temp">Loading methods...</p>`);
   let o = {
     fields: "title stage class ccNum pn pnFull leadsInCourse leadHeadCode",
-    stage: "4;5;6;7;8;9;10;11;12"
+    stage: stages
   };
+  //prevent stuff while searching
+  $("#viewcollections,#addmethods,#methodnamelist,#loadmethods").hide();
+  $("#methodstage,#methodclass,#methodsearch").prop("disabled", true);
 
   $.post("/find/method", o, (mm) => {
     console.log("methods retrieved");
-    bigmethodobj = {};
-    methodnames = [{stage: 4, classes: []},{stage: 5, classes: []},{stage: 6, classes: []},{stage: 7, classes: []},{stage: 8, classes: []}, {stage: 9, classes: []}, {stage: 10, classes: []}, {stage: 11, classes: []}, {stage: 12, classes: []}];
+    if (stagesloaded.length === 0) {
+      bigmethodobj = {};
+      methodnames = [];
+    }
+    let nstages = stages.split(";").map(n => Number(n));
+    nstages.forEach(n => {
+      methodnames.push({stage: n, classes: []});
+      stagesloaded.push(n);
+    });
+    
     mm.forEach(m => {
       let small = {title: m.title, cc: "cc"+m.ccNum};
       m.leadLength = m.pnFull.length;
-      let stageo = methodnames[m.stage-4];
+      let stageo = methodnames.find(o => o.stage === m.stage);
       let co = stageo.classes.find(obj => obj.class === m.class);
       if (co) {
         co.methods.push(small);
@@ -193,22 +239,32 @@ function getmethods() {
       bigmethodobj[small.cc] = m;
     });
 
+    $("#methodstage option").hide();
+    stagesloaded.forEach(n => {
+      let child = n-2;
+      let opt = $("#methodstage option:nth-child("+child+")");
+      opt.show();
+      if (searchparams.stage && n === searchparams.stage) opt.prop("selected", true);
+    });
     buildmethodlist();
     $("#temp").remove();
-    $("#addmethods").show();
+    $("#methodstage,#methodclass,#methodsearch").prop("disabled", false);
+    if (currentscreen === "collectionlist") $("#addmethods").show();
+    if (stagesloaded.length < 14) $("#loadmethods").show();
+    if (currentscreen === "addmethodscreen") $("#viewcollections").show();
   });
 }
 
 //changes to how localstorage items need to be structured
 function tempcleanup() {
-  smallmethodobj = {};
+  //smallmethodobj = {};
   mymethods.forEach(m => {
     let i = m.collections.indexOf("all-my-methods");
     if (i > -1) {
       m.collections.splice(i,1);
     }
-    let obj = bigmethodobj[m.ccNum];
-    smallmethodobj[m.ccNum] = obj;
+    //let obj = bigmethodobj[m.ccNum];
+    //smallmethodobj[m.ccNum] = obj;
   });
   if (mycollections.length && !mycollections[0].position) {
     mycollections.forEach((c,i) => c.position = i+2);
@@ -230,6 +286,8 @@ function savelocal() {
 
 //search screen
 function searchmethods() {
+  cancelmethodload();
+  currentscreen = "addmethodscreen";
   $("#collectionlist,#collectionpanel,#addmethods").hide();
   $("#methodpanel").addClass("hidden");
   $("#addmethodscreen,#viewcollections").show();
@@ -246,6 +304,8 @@ function homeclick() {
 
 //return to my collections
 function homeview() {
+  cancelmethodload();
+  currentscreen = "collectionlist";
   $("#addmethodscreen,#collectionpanel,#alert,#viewcollections").hide();
   $("#methodpanel").addClass("hidden");
   //reset stuff
@@ -262,12 +322,9 @@ function backfrommethod(e) {
   let what = $(e.currentTarget).attr("id").slice(6);
   $("#methodpanel").addClass("hidden");
   currentmethod = null;
-  if (what === "collection") {
-    $("#collectionpanel").show();
-  } else {
-    //search
-    $("#addmethodscreen").show();
-  }
+  currentscreen = what === "collection" ? "collectionpanel" : "addmethodscreen";
+  $("#"+currentscreen).show();
+  
 }
 
 //from within a collection
@@ -283,6 +340,7 @@ function methodclick(e) {
 
 //view method via search
 function viewfromsearch(e) {
+  cancelmethodload();
   let id = $("#methodnamelist li.selected").attr("id");
   let from = "search";
   
@@ -294,6 +352,7 @@ function viewfromsearch(e) {
 
 //view collection from list
 function collclick(e) {
+  cancelmethodload();
   $("#addmethods").hide();
   $("#viewcollections").show();
   let cid = $(e.currentTarget).parent().attr("id");
@@ -305,16 +364,17 @@ function collclick(e) {
 
 // ***** method search functions *****
 
-const stagenames = ["Minimus", "Doubles", "Minor", "Triples", "Major", "Caters", "Royal", "Cinques", "Maximus"];
+const stagenames = ["Singles", "Minimus", "Doubles", "Minor", "Triples", "Major", "Caters", "Royal", "Cinques", "Maximus", "Sextuples", "Fourteen", "Septuples", "Sixteen"];
 //build method title list
 function buildmethodlist() {
-  $("#methodsearch").val("");
+  $("#methodsearch").val("").prop("disabled", false);
   searchval = "";
   $("#methodnamelist ul").contents().remove();
   let methodset = searchparamstuff(); //get this based on search terms
-  let stagename = stagenames[searchparams.stage-4];
+  let stagename = stagenames[searchparams.stage-3];
   if (methodset.length === 0) {
     $("#methodnamelist ul").append(`<li>No ${searchparams.class} ${stagename} methods exist!</li>`);
+    $("#methodsearch").prop("disabled", true);
   }
   
   methodset.forEach((m,i) => {
@@ -329,9 +389,10 @@ function buildmethodlist() {
 }
 
 function searchparamstuff() {
+  cancelmethodload();
   searchparams.stage = Number($("#methodstage").val());
   searchparams.class = $("#methodclass option:checked").text();
-  let classo = methodnames[searchparams.stage-4].classes.find(o => o.class === searchparams.class);
+  let classo = methodnames.find(o => o.stage === searchparams.stage).classes.find(o => o.class === searchparams.class);
   if (classo) {
     return classo.methods.sort((a,b) => a.title.localeCompare(b.title));
   } else {
@@ -341,6 +402,7 @@ function searchparamstuff() {
 
 //[todo]
 function methodkeyup(e) {
+  cancelmethodload();
   let search = $("#methodsearch").val().trim().toLowerCase();
   if (search != searchval) {
     filtermethodlist(search);
@@ -606,6 +668,7 @@ function cancelemptycoll() {
 // ***** viewing/editing a collection *****
 
 function viewcoll(cid) {
+  currentscreen = "collectionpanel";
   let cmethods = cid === "all-my-methods" ? mymethods : mymethods.filter(m => m.collections.includes(cid));
   currentcollection = cid === "all-my-methods" ? allmymethods : mycollections.find(c => c.id === cid);
   sortby = currentcollection.sort || "title";
@@ -875,6 +938,7 @@ function toggledisplay() {
 
 //m is a string: "cc"+ccNum
 function viewmethod(m, from) {
+  currentscreen = "methodpanel";
   //remove stuff from many divs
   $("#methodbackcontainer,#methodcollections,#methodinfobox,#methodcontainer,#methodnoteslist ul,#choosecoll").contents().remove();
   $("#addmethodnote").hide();
@@ -975,7 +1039,7 @@ function dropdown(arrow) {
         break;
       case "methodcollections": case "methodinfobox":
         let n = which.find("li").length;
-        h = (n+2) + "em";
+        h = (n+3) + "em";
         break;
       
         //might need to copy methodcollections when I'm showing more properties

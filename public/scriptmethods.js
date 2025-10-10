@@ -576,11 +576,12 @@ function savemethod(mid, cid) {
 
 // ***** collection functions *****
 
-//only do this once at beginning, to preserve options (sorting etc.) for later
-//will need to update collection stuff elsewhere
+//saving collection sort in mycollections
+//editing "All my methods" will prompt rebuild
 function buildcollections() {
   if (account) {
     let tbody = $("#collectionlist tbody");
+    tbody.contents().remove();
 
     let move = `<select class="cposition">`;
     for (let i = 1; i <= mycollections.length+1; i++) {
@@ -594,7 +595,7 @@ function buildcollections() {
       if (!c) c = allmymethods;
       let num = c.id === "all-my-methods" ? mymethods.length : mymethods.filter(m => m.collections.includes(c.id)).length;
       let last = c.id === "all-my-methods" ? "" : `<td><button class="remove">-</button></td>`;
-      let row = `<tr id="${c.id}"><td class="collection">${c.title}</td><td>${num}</td><td>${move}</td>${last}</tr>`;
+      let row = `<tr id="${c.id}"><td class="collection">${c.title}</td><td class="count">${num}</td><td>${move}</td>${last}</tr>`;
       tbody.append(row);
       $("#collectionlist tr:last-child .cposition option:nth-child("+i+")").prop("selected", true);
     }
@@ -718,6 +719,8 @@ function viewcoll(cid) {
 function editcollection() {
   //editing = true;
   $("#editcollection,#collsort").hide();
+  //can't change title of "All my methods"
+  $("#titleedit").prop("disabled", currentcollection.id === "all-my-methods");
   $("#collectionpanel .edit").show();
 }
 
@@ -729,20 +732,33 @@ function savecolledits() {
   if (err) {
     $("#titleediterror").text(err);
   } else {
-    //still need to do title stuff!
+    //more title stuff!
     currentcollection.title = title;
-    $("#"+currentcollection.id + " td:first-child").text(title);
+    $("#"+currentcollection.id + " td.collection").text(title);
     //methods removed
     collectionedits.forEach(id => {
-      let m = mymethods.find(o => o.id === id);
-      let i = m.collections.indexOf(id);
-      m.collections.splice(i, 1);
+      let j = mymethods.findIndex(o => o.id === id);
+      if (currentcollection.id === "all-my-methods") {
+        mymethods.splice(j,1);
+      } else {
+        let m = mymethods[j];
+        let i = m.collections.indexOf(id);
+        m.collections.splice(i, 1);
+      }
+      
     });
-    let num = $("#collectionpanel tbody tr").length;
-    $("#"+currentcollection.id + " td:nth-child(2)").text(num.toString());
+    //update method counts in collection list
+    if (currentcollection.id === "all-my-methods" && collectionedits.length) {
+      //probably need to just rebuild the collection list
+      buildcollections();
+    } else if (collectionedits.length) {
+      let num = $("#collectionpanel tbody tr").length;
+      //another way to identify this column??
+      $("#"+currentcollection.id + " td.count").text(num.toString());
+    }
+    savelocal();
     //return to collection screen
     cancelcolledits();
-    savelocal();
   }
 }
 

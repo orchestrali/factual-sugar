@@ -32,6 +32,7 @@ var currentscreen = "collectionlist";
 //method object from mymethods
 var currentmethod;
 var currentcollection;
+var currentthing;
 var currentnote;
 //detailed info of method being viewed
 //needs to have: pnFull, leadsInCourse, leadLength
@@ -86,14 +87,12 @@ $(function() {
   $("#savemethod").on("click", addmethodtocoll);
 
   //note functions
-  $("#addmethodnote").on("click", addnote);
+  $("#addnote").on("click", editnote);
   $("#savenote").on("click", savenote);
-  $("#methodnoteslist").on("click", "li", viewnoteclick);
-  $("#noteback").on("click", () => {
-    $("#noteviewer").hide();
-    $("#methodnoteslist").show();
-  });
+  $("#noteslist").on("click", "li", viewnoteclick);
+  $("#noteback").on("click", backfromnote);
   $("#editnote").on("click", editnote);
+  $("#cancelnote").on("click", canceleditnote);
   $("#notetitle").on("keyup", notetitlekeyup);
 
   //collection list functions
@@ -273,6 +272,9 @@ function tempcleanup() {
     if (i > -1) {
       m.collections.splice(i,1);
     }
+    m.notes.forEach(n => {
+      n.id = "mn"+n.id;
+    });
     //let obj = bigmethodobj[m.ccNum];
     //smallmethodobj[m.ccNum] = obj;
   });
@@ -308,14 +310,16 @@ function cancelthings() {
   //new note
   //editing note
   //loading methods (may already be done)
-  
+  //adding method to collection
 }
 
 //search screen
 function searchmethods() {
-  currentscreen = "addmethodscreen";
-  $("#collectionlist").hide();
-  $("#addmethodscreen").show();
+  if (!editing) { //if I'm not rearranging the collection list
+    currentscreen = "addmethodscreen";
+    $("#collectionlist").hide();
+    $("#addmethodscreen").show();
+  }
 }
 
 //attempt to return to my collections
@@ -336,14 +340,17 @@ function homeview() {
   collectionedits = [];
   currentmethod = null;
   currentcollection = null;
+  currentthing = null;
   currentnote = null;
   changescreen();
 }
 
 function backfrommethod(e) {
   let what = $(e.currentTarget).attr("id").slice(6);
-  currentmethod = null;
   currentscreen = what === "collection" ? "collectionpanel" : "addmethodscreen";
+  currentmethod = null;
+  currentthing = currentcollection;
+  if (currentthing) buildnoteslist(currentthing);
   changescreen();
 }
 
@@ -370,7 +377,9 @@ function viewfromsearch(e) {
 //view collection from list
 function collclick(e) {
   let cid = $(e.currentTarget).parent().attr("id");
-  viewcoll(cid);
+  if (!editing) { //can't view collection when trying to rearrange the list
+    viewcoll(cid);
+  }
 }
 
 
@@ -515,8 +524,8 @@ function respell(name) {
 function addmethodfromsearch() {
   let mid = $("#methodnamelist li.selected").attr("id");
   let cid = $("#colllist").val();
-  let mym = savemethod(mid, cid);
-  if (!mym) {
+  let mym = savemethod(mid, cid); //[mym]
+  if (mym) {
     let li = $("#methodnamelist li.selected");
     let text = li.text();
     let ntext = "✓ "+text;
@@ -541,14 +550,16 @@ function savemethod(mid, cid) {
   console.log("saving method");
   console.log(mid, cid);
   let mym = mymethods.find(o => o.ccNum === mid);
+  let o;
   let trs = [cid];
   if (mym) {
-    //already in mymethods
-    mym.collections.push(cid);
+    //already in mymethods - cid can't be all-my-methods
+    //prevent duplicates?
+    if (!mym.collections.includes(cid)) mym.collections.push(cid);
   } else {
     //get method info
     let title = bigmethodobj[mid].title;
-    let o = {
+    o = {
       title: title,
       notes: [],
       ccNum: mid,
@@ -563,18 +574,18 @@ function savemethod(mid, cid) {
     smallmethodobj[mid] = bigmethodobj[mid];
   }
   trs.forEach(tr => {
-    let trtd = $("tr#"+tr + " td:nth-child(2)");
+    let trtd = $("tr#"+tr + " td.count");
     let num = Number(trtd.text());
     num++;
     trtd.text(num.toString());
   });
   
   savelocal();
-  return mym;
+  return o; //object from mymethods if it wasn't already there
 }
 
 
-// ***** collection functions *****
+// ***** collection list functions *****
 
 //saving collection sort in mycollections
 //editing "All my methods" will prompt rebuild
@@ -607,6 +618,7 @@ function buildcollections() {
 
 //cancel moving a collection within the collection list
 function cancelcollmove(e) {
+  editing = false;
   let i = $(".cancelcollmove").parent().parent().index()+1;
   $("#collectionlist tbody tr:nth-child("+i+") option:nth-child("+i+")").prop("selected", true);
   $(".movecoll,.cancelcollmove").remove();
@@ -615,6 +627,7 @@ function cancelcollmove(e) {
 
 //change collection position dropdown selection
 function movecoll(e) {
+  editing = true;
   $(e.currentTarget).after(`<button class="movecoll">Go</button><button class="cancelcollmove">Cancel</button>`);
   $(".cposition").prop("disabled", true);
 }
@@ -650,6 +663,7 @@ function bumpcoll(e) {
   });
   $(".movecoll,.cancelcollmove").remove();
   $(".cposition").prop("disabled", false);
+  editing = false;
 }
 
 //[todo]
@@ -697,6 +711,7 @@ function viewcoll(cid) {
   currentscreen = "collectionpanel";
   let cmethods = cid === "all-my-methods" ? mymethods : mymethods.filter(m => m.collections.includes(cid));
   currentcollection = cid === "all-my-methods" ? allmymethods : mycollections.find(c => c.id === cid);
+  currentthing = currentcollection;
   sortby = currentcollection.sort || "title";
   $(`#collsort input[value="${sortby}"]`).prop("checked", true);
   cmethods.sort(sortmethods);
@@ -710,7 +725,8 @@ function viewcoll(cid) {
     let tr = `<tr id="${m.ccNum}"><td class="method">${m.title}</td><td class="edit"><button class="remove">-</button></td></tr>`;
     tbody.append(tr);
   });
-  
+  $(".notescreen").hide();
+  buildnoteslist(currentthing);
   $("#collectionpanel .edit").hide();
   changescreen();
 }
@@ -718,7 +734,7 @@ function viewcoll(cid) {
 //start editing a collection
 function editcollection() {
   //editing = true;
-  $("#editcollection,#collsort").hide();
+  $("#editcollection,#collsort,button.change").hide();
   //can't change title of "All my methods"
   $("#titleedit").prop("disabled", currentcollection.id === "all-my-methods");
   $("#collectionpanel .edit").show();
@@ -766,7 +782,7 @@ function cancelcolledits() {
   editing = false;
   collectionedits = [];
   //viewcoll will hide the edit stuff but won't show currently hidden things
-  $("#editcollection,#collsort").show();
+  $("#editcollection,#collsort,button.change").show();
   viewcoll(currentcollection.id);
 }
 
@@ -824,40 +840,74 @@ function sortmethods(a,b) {
 
 
 
-// ***** method note functions *****
+// ***** note functions *****
 
 function viewnoteclick(e) {
-  let title = $(e.currentTarget).text();
-  let id = Number($(e.currentTarget).attr("id").slice(1));
-  console.log(id);
-  viewnote(id, title);
+  let id = $(e.currentTarget).attr("id");
+  let note = currentthing.notes.find(o => o.id === id);
+  viewnote(note);
 }
 
-function viewnote(id, title) {
-  let note = currentmethod.notes.find(n => n.id === id);
-  //console.log(note);
-  $("#noteviewer h4").html(title);
+function viewnote(note) {
+  $("#noteviewer h4").html(note.title);
   $("#notecontainer").remove();
   $("#noteviewer").append(`<pre id="notecontainer">${note.contents}</pre>`);
   currentnote = note;
-  $("#methodnoteslist").hide();
+  $(".notescreen").hide();
   $("#noteviewer").show();
 }
 
-function editnote() {
-  $("#notetitle").val(currentnote.title);
-  let note = currentmethod.notes.find(n => n.id === currentnote.id);
-  $("#note").val(note.contents);
+function backfromnote() {
+  currentnote = null;
   $("#noteviewer").hide();
+  $("#noteslist").show();
+}
+
+var months = ["Jan","Feb","Mar","Apr","May", "Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+//edit or add new
+function editnote() {
+  let title, text;
+  if (currentnote) {
+    title = currentnote.title;
+    text = currentnote.contents;
+  } else {
+    let today = new Date();
+    let date = [today.getDate(), months[today.getMonth()], today.getFullYear()];
+    title = date.join(" ");
+    text = "";
+  }
+  if (!currentmethod) {
+    $("#editcollection").hide();
+  }
+  $("#notetitle").val(title);
+  $("#note").val(text);
+  $(".notescreen").hide();
   $("#noteeditor").show();
 }
+
+//needs to handle edits AND new notes
+//actually cancel; pretty easy
+function canceleditnote() {
+  if (!currentmethod) {
+    $("#editcollection").show();
+  }
+  $("#noteeditor").hide();
+  let show = currentnote ? "#noteviewer" : "#noteslist";
+  $(show).show();
+}
+
+//[todo]
+function notedelete() {
+  
+}
+
 
 function notetitlekeyup(e) {
   $("#notetitleerror").text("");
   let title = $(e.currentTarget).val().trim();
-  let existing = currentmethod.notes.map(n => n.title);
+  let existing = currentthing.notes.map(n => n.title);
   if (currentnote) {
-    let i = currentmethod.notes.findIndex(n => n.id === currentnote.id);
+    let i = currentthing.notes.findIndex(n => n.id === currentnote.id);
     existing.splice(i, 1);
   }
   if (existing.includes(title)) {
@@ -865,48 +915,51 @@ function notetitlekeyup(e) {
   }
 }
 
-var months = ["Jan","Feb","Mar","Apr","May", "Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-//displays new note screen
-function addnote() {
-  currentnote = null;
-  let today = new Date();
-  let date = [today.getDate(), months[today.getMonth()], today.getFullYear()];
-  let string = date.join(" ");
-  $("#methodnoteslist").hide();
-  $("#notetitle").val(string);
-  $("#note").val("");
-  $("#noteeditor").show();
-}
-
 //{saving}
 function savenote() {
   let text = $("#note").val();
   let err = $("#notetitleerror").text();
   if (text.length && !err.length) {
-    let id = Date.now();
+    let type = currentmethod ? "m" : "c";
+    let id = type + "n" + Date.now();
     let o = {
       title: $("#notetitle").val().trim(),
       contents: text
     };
     
-    if (o.title.length === 0) o.title = "note "+(currentmethod.notes.length+1);
+    if (o.title.length === 0) o.title = "note "+(currentthing.notes.length+1);
     if (currentnote) {
       o.id = currentnote.id;
-      let i = currentmethod.notes.findIndex(n => n.id === currentnote.id);
-      currentmethod.notes.splice(i, 1, o);
-      $("#n"+o.id).html(o.title);
+      let i = currentthing.notes.findIndex(n => n.id === currentnote.id);
+      currentthing.notes.splice(i, 1, o);
+      $("#"+o.id).html(o.title);
     } else {
       o.id = id;
-      currentmethod.notes.push(o);
-      $("#methodnoteslist ul").append(`<li id="n${o.id}">${o.title}</li>`);
+      currentthing.notes.push(o);
+      $("#noteslist ul").append(`<li id="${o.id}">${o.title}</li>`);
     }
-    
-    currentnote = o;
-    $("#noteeditor").hide();
-    viewnote(o.id, o.title);
+
     savelocal();
+    if (!currentmethod) {
+      $("#editcollection").show();
+    }
+    viewnote(o.id, o.title);
+  } else {
+    //empty note or problem with title
+    //[todo]
   }
-  
+}
+
+//obj is currentthing
+function buildnoteslist(obj) {
+  $("#noteslist li").remove();
+  if (!obj.notes) obj.notes = [];
+  let notes = obj.notes;
+  //add the notes...
+  notes.forEach(o => {
+    $("#noteslist ul").append(`<li id="${o.id}">${o.title}</li>`);
+  });
+  $("#noteslist").show();
 }
 
 
@@ -937,10 +990,13 @@ function addmethodtocoll() {
   let mid = "cc"+methodobj.ccNum;
   let cid = $("#choosecoll").val();
   let coll = cid === "all-my-methods" ? allmymethods : mycollections.find(o => o.id === cid);
-  let mym = savemethod(mid, cid);
+  let mym = savemethod(mid, cid); //[mym]
   $(`#choosecoll option[value="${cid}"]`).remove();
   let li = `<li>${coll.title}</li>`;
-  if (!mym) {
+  if (mym) { //method was not already in mymethods
+    currentmethod = mym;
+    currentthing = currentmethod;
+    buildnoteslist(currentthing);
     if (cid != "all-my-methods") $(`#choosecoll option[value="all-my-methods"]`).remove();
     $("#methodcollections").append(`<ul></ul>`);
     $("#methodpanel > h4:first-of-type").show();
@@ -949,8 +1005,7 @@ function addmethodtocoll() {
     let ntext = "✓ "+text;
     li.text(ntext);
   }
-  $("#addmethodnote").show();
-  $("#methodnoteslist").show();
+  
   $("#methodcollections ul").append(li);
 }
 
@@ -980,8 +1035,8 @@ function toggledisplay() {
 function viewmethod(m, from) {
   currentscreen = "methodpanel";
   //remove stuff from many divs
-  $("#methodbackcontainer,#methodcollections,#methodinfobox,#methodcontainer,#methodnoteslist ul,#choosecoll").contents().remove();
-  $("#addmethodnote").hide();
+  $("#methodbackcontainer,#methodcollections,#methodinfobox,#methodcontainer,#choosecoll").contents().remove();
+  $(".notescreen").hide();
   //"from" a collection or a search
   let button = "backto"+from;
   $("#methodbackcontainer").append(`<button id="${button}" class="back">Back to ${from}</button>`);
@@ -996,9 +1051,11 @@ function viewmethod(m, from) {
   
   buildrowarr();
   let lh = rowstring(rowarr[mobj.leadLength]);
-  mobj.huntBells = [];
-  for (let i = 0; i < stage; i++) {
-    if (lh[i] === places[i]) mobj.huntBells.push(i+1);
+  if (!mobj.huntBells) {
+    mobj.huntBells = [];
+    for (let i = 0; i < stage; i++) {
+      if (lh[i] === places[i]) mobj.huntBells.push(i+1);
+    }
   }
   if (mobj.leadHeadCode) {
     lh += " (code "+mobj.leadHeadCode+")";
@@ -1009,13 +1066,14 @@ function viewmethod(m, from) {
   //need to save bluebell choice and reapply it
   $("#bluebell").html(bluebellopts(stage));
   $('#bluebell').val(bluebell);
-  console.log("drawing method??");
+  //console.log("drawing method??");
   //this function will take view prefs into account
   drawmethod(mobj);
   
   if (account) {
     currentmethod = mymethods.find(o => o.title === mobj.title);
     if (currentmethod) {
+      currentthing = currentmethod;
       //display collections it's in
       $("#methodcollections").append(`<ul></ul>`);
       let ul = $("#methodcollections ul");
@@ -1043,11 +1101,9 @@ function viewmethod(m, from) {
         $("#addtocollection").hide();
       }
       //display any notes
-      currentmethod.notes.forEach(o => {
-        $("#methodnoteslist ul").append(`<li id="n${o.id}">${o.title}</li>`);
-      });
+      buildnoteslist(currentthing);
       //display add note button
-      $("#addmethodnote").show();
+      //$("#addmethodnote").show();
     } else {
       $("#methodpanel > h4:first-of-type").hide();
       $("#choosecoll").append(`<option value="all-my-methods">All my methods</option>`);

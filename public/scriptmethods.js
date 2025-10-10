@@ -61,7 +61,7 @@ $(function() {
   $("#abandon").on("click", homeview);
   $(".viewcollections").on("click", homeclick);
   $("#stayonpage").on("click", () => $("#alert").hide());
-  $("#loadmethods").on("click", showloadmethods);
+  $(".loadmethods").on("click", showloadmethods);
 
   //method search functions
   $("#addmethods").on("click", searchmethods);

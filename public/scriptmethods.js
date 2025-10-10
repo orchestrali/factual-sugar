@@ -296,8 +296,9 @@ function savelocal() {
 
 // ***** moving between screens?? *****
 
-function changescreen() {
+function changescreen(no) {
   $(".screen,#alert").hide();
+  if (no) $(".notescreen").hide();
   //cancel things??
   $("#"+currentscreen).show();
 }
@@ -342,7 +343,7 @@ function homeview() {
   currentcollection = null;
   currentthing = null;
   currentnote = null;
-  changescreen();
+  changescreen(true);
 }
 
 function backfrommethod(e) {
@@ -350,8 +351,9 @@ function backfrommethod(e) {
   currentscreen = what === "collection" ? "collectionpanel" : "addmethodscreen";
   currentmethod = null;
   currentthing = currentcollection;
+  
   if (currentthing) buildnoteslist(currentthing);
-  changescreen();
+  changescreen(what === "search");
 }
 
 //from within a collection

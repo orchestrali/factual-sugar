@@ -71,6 +71,14 @@ td:first-child:hover {
   cursor: pointer;
 }
 
+.dialog {
+  position: fixed;
+  width: 90%;
+  max-width: 700px;
+  z-index: 20;
+  background-color: white;
+}
+
 div.screen {
   width: 95%;
   max-width: 700px;
@@ -88,13 +96,7 @@ div.screen {
   z-index: 10
 }
 
-#loadingcontainer {
-  position: fixed;
-  width: 90%;
-  max-width: 700px;
-  z-index: 20;
-  background-color: white;
-}
+
 #loadingcontainer label {
   margin-right: 5px;
 }

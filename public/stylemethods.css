@@ -79,6 +79,10 @@ td:first-child:hover {
   background-color: white;
 }
 
+.notescreen {
+  display: none;
+}
+
 div.screen {
   width: 95%;
   max-width: 700px;

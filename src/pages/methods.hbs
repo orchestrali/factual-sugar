@@ -153,26 +153,35 @@
       <h4><div class="arrow"></div>Method info</h4>
       <div id="methodinfobox"></div>
       <div id="methodcontainer"></div>
-      <div id="methodnoteslist">
-        <button id="addmethodnote">Add note</button>
+    </div>
+
+    <div id="notepanel">
+      <div id="noteslist" class="notescreen">
+        <button id="addnote" class="change">Add note</button>
         <ul></ul>
       </div>
-      <div id="noteeditor">
+      <div id="noteeditor" class="notescreen">
         <div>
-        <label for="notetitle">Title: <input type="text" id="notetitle" /></label>
+          <label for="notetitle">Title: <input type="text" id="notetitle" /></label>
         </div>
         <p class="errors" id="notetitleerror"></p>
         <textarea id="note" rows="20" cols="30"></textarea>
-        <div><button id="savenote">Save</button></div>
+        <div>
+          <button id="savenote">Save</button>
+          <button id="cancelnote">Cancel</button>
+        </div>
         
       </div>
-      <div id="noteviewer">
+      <div id="noteviewer" class="notescreen">
         <button id="noteback">Back to list</button>
-        <button id="editnote">Edit note</button>
+        <button id="editnote" class="change">Edit note</button>
+        <!--<button id="deletenote" class="change">Delete note</button>-->
         <h4></h4>
         
       </div>
     </div>
+
+    
     
     <script
   src="https://code.jquery.com/jquery-3.6.0.min.js"

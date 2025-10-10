@@ -120,6 +120,7 @@ function setuppage() {
   //show info if new user?
 }
 
+//show dialog to choose stages of methods to load
 function showloadmethods() {
   $("#overlay").show();
   let opts = `Method stages to load: `;
@@ -229,6 +230,7 @@ function getmethods(stages) {
       methodnames.push({stage: n, classes: []});
       stagesloaded.push(n);
     });
+    stagesloaded.sort((a,b) => a-b);
     
     mm.forEach(m => {
       let small = {title: m.title, cc: "cc"+m.ccNum};
@@ -243,12 +245,16 @@ function getmethods(stages) {
       bigmethodobj[small.cc] = m;
     });
 
-    $("#methodstage option").hide();
+    $("#methodstage option").prop("disabled", true);
     stagesloaded.forEach(n => {
       let child = n-2;
       let opt = $("#methodstage option:nth-child("+child+")");
-      opt.show();
+      opt.prop("disabled", false);
       if (searchparams.stage && n === searchparams.stage) opt.prop("selected", true);
+      if (!searchparams.stage) {
+        opt.prop("selected", true);
+        searchparams.stage = n;
+      }
     });
     buildmethodlist();
     $("#temp").remove();

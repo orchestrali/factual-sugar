@@ -80,7 +80,7 @@ $(function() {
   //method functions
   $("#displayopts").on("change", toggledisplay);
   $("#bluebell").on("change", bluebellchange);
-  $("#collectionpanel").on("click", "td:first-child", methodclick);
+  $("#collectionpanel").on("click", "td.method", methodclick);
   $("#methodbackcontainer").on("click", "button", backfrommethod);
   $("#methodpanel > h4").on("click", dropdownclick); //.arrow clicks should bubble?
   $("#savemethod").on("click", addmethodtocoll);

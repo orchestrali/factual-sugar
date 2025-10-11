@@ -47,13 +47,16 @@ var noteediting;
 //searching methods
 var searchparams = {};
 var searchval = "";
+//collection to be deleted
+var targetcoll;
 
 //{saving} - parts where I need to save user input
 //[todo] - stuff to write or edit!
 
 
 $(function() {
-  $(".loadmethods,#overlay,#addmethods").hide();
+  $(".loadmethods,#overlay,#addmethods,.dialog").hide();
+  console.log($("body > h4").text().length);
   setupuser();
   $("#methodcontainer").svg({onLoad: (o) => {
     svg = o;
@@ -62,8 +65,12 @@ $(function() {
   //big button clicks
   $("#abandon").on("click", homeview);
   $(".viewcollections").on("click", homeclick);
-  $("#stayonpage").on("click", () => $("#alert,#overlay").hide());
+  $(".stayonpage,.closeabout").on("click", stayonpage);
   $(".loadmethods").on("click", showloadmethods);
+  $("#aboutbutton").on("click", () => $("#overlay,#about").show());
+
+  //note or collection
+  $("#confirmdelete").on("click", confirmdelete);
 
   //method search functions
   $("#addmethods").on("click", searchmethods);
@@ -95,13 +102,14 @@ $(function() {
   $("#editnote").on("click", editnote);
   $("#cancelnote").on("click", canceleditnote);
   $("#notetitle").on("keyup", notetitlekeyup);
+  $("#deletenote").on("click", clickdelete);
 
   //collection list functions
   $("#collectionlist").on("click", "td.collection", collclick);
   $("#colltitle,#titleedit").on("keyup", colltitlekeyup);
   $("#newcollection").on("click", () => $("#newcollpanel").removeClass("hidden"));
   $("#savecoll").on("click", savenewcoll);
-  $("#collectionlist").on("click", ".remove", removecoll); //not functional yet
+  $("#collectionlist").on("click", ".remove", clickdelete); //not functional yet
   $("#collectionlist").on("change", ".cposition", movecoll);
   $("#collectionlist").on("click", ".movecoll", bumpcoll);
   $("#collectionlist").on("click", ".cancelcollmove", cancelcollmove);
@@ -400,6 +408,42 @@ function collclick(e) {
 }
 
 
+function stayonpage() {
+  targetcoll = null;
+  $(".dialog,#overlay").hide();
+}
+
+//use for collection and note
+function clickdelete(e) {
+  let elem = $(e.currentTarget);
+  let id = elem.attr("id");
+  let text = id === "deletenote" ? "note" : "collection";
+  $("#deletedialog span").text(text);
+  //set target to remove
+  if (text != "note") {
+    let cid = elem.parent().parent().attr("id");
+    targetcoll = mycollections.find(o => o.id === cid);
+  }
+  $("#overlay,#deletedialog").show();
+}
+
+function confirmdelete() {
+  if (targetcoll) {
+    removecoll();
+  } else if (currentnote) {
+    let i = currentthing.notes.findIndex(n => n.id === currentnote.id);
+    if (i > -1) {
+      currentthing.notes.splice(i, 1);
+      currentnote = null;
+      savelocal();
+      $(".notescreen").hide();
+      buildnoteslist(currentthing);
+    }
+  }
+  $("#overlay,#deletedialog").hide();
+}
+
+
 
 
 // ***** method search functions *****
@@ -684,9 +728,20 @@ function bumpcoll(e) {
 }
 
 //[todo]
-function removecoll(e) {
-  let cid = $(e.currentTarget).parent().parent().attr("id");
-  //probably want a dialog to confirm deletion
+function removecoll() {
+  let cid = targetcoll.id;
+  //remove methods from collection - I suppose this is just tidy
+  mymethods.forEach(m => {
+    let i = m.collections.indexOf(cid);
+    if (i > -1) m.collections.splice(i, 1);
+  });
+  //remove collection
+  let i = mycollections.findIndex(o => o.id === cid);
+  mycollections.splice(i, 1);
+  //
+  savelocal();
+  $("#"+cid).remove();
+  targetcoll = null;
 }
 
 

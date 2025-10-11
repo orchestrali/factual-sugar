@@ -15,13 +15,28 @@
   <body>
     <!-- header ???? -->
     <h4>{{test}}</h4>
-    
+    <div id="aboutbutton" style="display:none;">About</div>
     <div id="alert" class="dialog">
       <p>You have unsaved changes! Abandon them?</p>
       <button id="abandon">Yes</button><button id="stayonpage">No, stay on this page</button>
     </div>
     <!-- about button? or dialog? where do I put the other? -->
-    <div id="about"></div>
+    <div id="about" class="dialog" style="display:none;">
+      <div class="closeabout"></div>
+      <h3>About this site</h3>
+      <h4>What does it do?</h4>
+      <p>This is a website for exploring change-ringing methods. You can create collections, add methods to them, and make notes on both collections and methods.</p>
+      <h4>Who made it?</h4>
+      <p>Alison Stevens, currently a ringer in Edinburgh.</p>
+      <h4>Planned additions/improvements</h4>
+      <ul>
+        <li>• Fancy method search</li>
+        <li>• Option to show numbers when viewing method as lines</li>
+        <li>• Download/print options</li>
+        <li>• Premade collections to add</li>
+      </ul>
+      <button class="closeabout">Close</button>
+    </div>
 
     <div id="overlay"></div>
     <div id="loadingcontainer" class="dialog"></div>

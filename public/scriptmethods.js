@@ -820,7 +820,7 @@ function togglecollview() {
   if (collview === "grid") {
     $("#editcollection,#collsort,#collectionpanel table").hide();
     $("#gridcontainer").contents().remove();
-    let cmethods = mymethods.filter(m => m.collections.includes(cid));
+    let cmethods = mymethods.filter(m => m.collections.includes(currentcollection.id));
     let heights = [];
     cmethods.forEach(m => {
       let mobj = smallmethodobj[m.ccNum];

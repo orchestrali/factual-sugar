@@ -1324,6 +1324,7 @@ function drawmethod(m, gridtype, rowarr, target) {
   let width = 40 + 16*stage;
   let height = 20; //target ? 40 : 20;
   height += 20*rowarr.length;
+  console.log("height: "+height);
   
     //gridtype === "grid" ? m.leadLength*20 : m.leadLength*m.leadsInCourse*20;
   let grid = svg.svg($(topparent), null, null, width, height, {class: "grid", xmlns: "http://www.w3.org/2000/svg", "xmlns:xlink": "http://www.w3.org/1999/xlink"});
@@ -1343,7 +1344,8 @@ function drawmethod(m, gridtype, rowarr, target) {
     let x = 16*stage+4;
     let mtitle = svg.text(numgroup, x, 9, m.title, {transform: "rotate(90 "+x.toString()+" 9)", style: "font-size: 12px; font-weight: bold;"});
     let length = Math.ceil($(mtitle).width());
-    if (length + 9 > height) $(grid).attr("height", length+12);
+    console.log(length);
+    if (length + 12 > height) $(grid).attr("height", length+12);
   }
   let pbs = [];
   

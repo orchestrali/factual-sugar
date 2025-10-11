@@ -363,7 +363,10 @@ function backfrommethod(e) {
     currentnote = null;
     currentthing = currentcollection;
     $(".notescreen").hide();
-    if (currentthing) buildnoteslist(currentthing);
+    if (currentthing) {
+      $("#editcollection").show();
+      buildnoteslist(currentthing);
+    }
     changescreen(); //what === "search" doesn't matter because I'm hiding screens anyway
   }
 }

@@ -800,7 +800,7 @@ function savenewcoll() {
       move += `<option${s}>${i}</option>`;
     }
     move += `</select>`;
-    let row = `<tr id="${coll.id}"><td class="collection">${title}</td><td class="count">0</td><td>${s}</td><td><button class="remove">-</button></td></tr>`;
+    let row = `<tr id="${coll.id}"><td class="collection">${title}</td><td class="count">0</td><td>${move}</td><td><button class="remove">-</button></td></tr>`;
     $("#collectionlist tbody").append(row);
     
     cancelemptycoll();

@@ -268,6 +268,7 @@ function getmethods(stages) {
         searchparams.stage = n;
       }
     });
+    tempcleanup(); //update smallmethodobj
     buildmethodlist();
     $("#temp").remove();
     
@@ -280,6 +281,7 @@ function getmethods(stages) {
 //changes to how localstorage items need to be structured
 function tempcleanup() {
   //smallmethodobj = {};
+  let needfetch;
   mymethods.forEach(m => {
     let i = m.collections.indexOf("all-my-methods");
     if (i > -1) {
@@ -293,12 +295,28 @@ function tempcleanup() {
       }
       
     });
-    //let obj = bigmethodobj[m.ccNum];
+    let obj = smallmethodobj[m.ccNum];
+    if (obj) {
+      if (!obj.huntBells) {
+        findhunts(obj);
+      }
+    } else if (!bigmethodobj) {
+      needfetch = true;
+    } else {
+      obj = bigmethodobj[m.ccNum];
+      if (obj) {
+        findhunts(obj);
+        smallmethodobj[m.ccNum] = obj;
+      } else {
+        needfetch = true;
+      }
+    }
     //smallmethodobj[m.ccNum] = obj;
   });
   if (mycollections.length && !mycollections[0].position) {
     mycollections.forEach((c,i) => c.position = i+2);
   }
+  if (needfetch) alert("Please load methods to fix gaps in your saved data");
   savelocal();
 }
 
@@ -637,6 +655,7 @@ function savemethod(mid, cid) {
     }
     mymethods.push(o);
     smallmethodobj[mid] = bigmethodobj[mid];
+    findhunts(smallmethodobj[mid]);
   }
   trs.forEach(tr => {
     let trtd = $("tr#"+tr + " td.count");
@@ -1301,7 +1320,7 @@ function drawmethod(m, gridtype, rowarr, target) {
     }
   }
   let width = 40 + 16*stage;
-  let height = target ? 40 : 20;
+  let height = 20; //target ? 40 : 20;
   height += 20*rowarr.length;
   
     //gridtype === "grid" ? m.leadLength*20 : m.leadLength*m.leadsInCourse*20;
@@ -1317,9 +1336,10 @@ function drawmethod(m, gridtype, rowarr, target) {
   //y increment between leadends
   let liney = m.leadLength*20;
   if (target) {
-    topy += 20;
-    liney += 20;
-    svg.text(numgroup, 8*stage+10, 20, m.title, {style: "font-size: 12px; font-weight: bold; text-anchor: middle;"});
+    //topy += 20;
+    //liney += 20;
+    let x = 16*stage+20;
+    svg.text(numgroup, x, 10, m.title, {transform: "rotate(90 "+x.toString()+" 10)", style: "font-size: 12px; font-weight: bold;"});
   }
   let pbs = [];
   
@@ -1406,6 +1426,15 @@ function bellnum(n) {
 function rowstring(arr) {
   let r = arr.map(n => places[n-1]);
   return r.join("");
+}
+
+function findhunts(mobj) {
+  let lead = buildlead(mobj.pnFull);
+  let lh = rowstring(lead[lead.length-1]);
+  mobj.huntBells = [];
+  for (let i = 0; i < mobj.stage; i++) {
+    if (lh[i] === places[i]) mobj.huntBells.push(i+1);
+  }
 }
 
 

@@ -362,8 +362,9 @@ function backfrommethod(e) {
     currentmethod = null;
     currentnote = null;
     currentthing = currentcollection;
+    $(".notescreen").hide();
     if (currentthing) buildnoteslist(currentthing);
-    changescreen(what === "search");
+    changescreen(); //what === "search" doesn't matter because I'm hiding screens anyway
   }
 }
 

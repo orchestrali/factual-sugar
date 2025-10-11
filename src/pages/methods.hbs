@@ -14,11 +14,19 @@
   </head>
   <body>
     <!-- header ???? -->
+    <header>
+      <h1>Method Notebook</h1>
+      <div id="aboutbutton" style="display:none;">About</div>
+    </header>
     <h4>{{test}}</h4>
-    <div id="aboutbutton" style="display:none;">About</div>
+    
     <div id="alert" class="dialog">
       <p>You have unsaved changes! Abandon them?</p>
       <button id="abandon">Yes</button><button id="stayonpage">No, stay on this page</button>
+    </div>
+    <div id="deletedialog" class="dialog">
+      <p>Confirm delete <span></span>?</p>
+      <button id="confirmdelete">Yes</button><button id="canceldelete" class="stayonpage">No</button>
     </div>
     <!-- about button? or dialog? where do I put the other? -->
     <div id="about" class="dialog" style="display:none;">

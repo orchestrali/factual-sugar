@@ -111,7 +111,7 @@ $(function() {
   //collection list functions
   $("#collectionlist").on("click", "td.collection", collclick);
   $("#colltitle,#titleedit").on("keyup", colltitlekeyup);
-  $("#newcollection").on("click", () => $("#newcollpanel").removeClass("hidden"));
+  $("#newcollection").on("click", addemptycoll);
   $("#savecoll").on("click", savenewcoll);
   $("#collectionlist").on("click", ".remove", clickdelete); //not functional yet
   $("#collectionlist").on("change", ".cposition", movecoll);

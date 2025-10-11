@@ -41,8 +41,9 @@ var stage;
 var rowarr;
 //methods within a collection; options "title" or "added"
 var sortby = "title";
-//currently just for editing a collection...
+//for editing a collection or moving collections in the list
 var editing;
+var noteediting;
 //searching methods
 var searchparams = {};
 var searchval = "";
@@ -61,7 +62,7 @@ $(function() {
   //big button clicks
   $("#abandon").on("click", homeview);
   $(".viewcollections").on("click", homeclick);
-  $("#stayonpage").on("click", () => $("#alert").hide());
+  $("#stayonpage").on("click", () => $("#alert,#overlay").hide());
   $(".loadmethods").on("click", showloadmethods);
 
   //method search functions
@@ -273,7 +274,12 @@ function tempcleanup() {
       m.collections.splice(i,1);
     }
     m.notes.forEach(n => {
-      n.id = "mn"+n.id;
+      if (typeof n.id === "number") {
+        n.id = "mn"+n.id;
+      } else if (n.id.length > 15) {
+        n.id = n.id.slice(-15);
+      }
+      
     });
     //let obj = bigmethodobj[m.ccNum];
     //smallmethodobj[m.ccNum] = obj;
@@ -297,7 +303,8 @@ function savelocal() {
 // ***** moving between screens?? *****
 
 function changescreen(no) {
-  $(".screen,#alert").hide();
+  $(".screen").hide(); //,#alert
+  currentnote = null;
   if (no) $(".notescreen").hide();
   //cancel things??
   $("#"+currentscreen).show();
@@ -325,8 +332,8 @@ function searchmethods() {
 
 //attempt to return to my collections
 function homeclick() {
-  if (editing) {
-    $("#alert").show();
+  if (editing || noteediting) {
+    $("#alert,#overlay").show();
   } else {
     homeview();
   }
@@ -334,10 +341,12 @@ function homeclick() {
 
 //return to my collections
 function homeview() {
+  $("#alert,#overlay").hide();
   currentscreen = "collectionlist";
   
   //reset stuff
   editing = false;
+  noteediting = false;
   collectionedits = [];
   currentmethod = null;
   currentcollection = null;
@@ -347,13 +356,15 @@ function homeview() {
 }
 
 function backfrommethod(e) {
-  let what = $(e.currentTarget).attr("id").slice(6);
-  currentscreen = what === "collection" ? "collectionpanel" : "addmethodscreen";
-  currentmethod = null;
-  currentthing = currentcollection;
-  
-  if (currentthing) buildnoteslist(currentthing);
-  changescreen(what === "search");
+  if (!noteediting) {
+    let what = $(e.currentTarget).attr("id").slice(6);
+    currentscreen = what === "collection" ? "collectionpanel" : "addmethodscreen";
+    currentmethod = null;
+    currentnote = null;
+    currentthing = currentcollection;
+    if (currentthing) buildnoteslist(currentthing);
+    changescreen(what === "search");
+  }
 }
 
 //from within a collection
@@ -361,7 +372,7 @@ function methodclick(e) {
   let cc = $(e.currentTarget).parent().attr("id");
   let from = "collection";
   
-  if (smallmethodobj[cc] && !editing) {
+  if (smallmethodobj[cc] && !editing && !noteediting) {
     viewmethod(cc, from);
   }
 }
@@ -868,6 +879,7 @@ function backfromnote() {
 var months = ["Jan","Feb","Mar","Apr","May", "Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 //edit or add new
 function editnote() {
+  noteediting = true;
   let title, text;
   if (currentnote) {
     title = currentnote.title;
@@ -890,6 +902,7 @@ function editnote() {
 //needs to handle edits AND new notes
 //actually cancel; pretty easy
 function canceleditnote() {
+  noteediting = false;
   if (!currentmethod) {
     $("#editcollection").show();
   }
@@ -945,7 +958,8 @@ function savenote() {
     if (!currentmethod) {
       $("#editcollection").show();
     }
-    viewnote(o.id, o.title);
+    noteediting = false;
+    viewnote(o);
   } else {
     //empty note or problem with title
     //[todo]

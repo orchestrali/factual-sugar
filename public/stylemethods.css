@@ -13,8 +13,8 @@ header {
   max-width: 700px;
 }
 
-h1 {
-  margin-bottom: 5px;
+body > h4 {
+  margin: 5px;
 }
 
 label {

@@ -62,7 +62,7 @@ $(function() {
   setupuser();
   $("#methodcontainer").svg({onLoad: (o) => {
     svg = o;
-    $("svg").remove();
+    
   }});
 
   //big button clicks
@@ -1284,6 +1284,7 @@ function bluebellopts(stage) {
 //m needs to have: huntBells, leadLength, stage
 //actually do I need m? wait currentmethod is for the object in my collection
 function drawmethod(m, gridtype, rowarr, target) {
+  $("#methodcontainer svg").remove();
   let topparent = target ? "#gridcontainer" : "#methodcontainer";
   let stage = m.stage;
   let bells = [];

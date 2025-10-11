@@ -50,6 +50,8 @@ var searchval = "";
 //collection to be deleted
 var targetcoll;
 
+var collview = "list";
+
 //{saving} - parts where I need to save user input
 //[todo] - stuff to write or edit!
 
@@ -60,6 +62,7 @@ $(function() {
   setupuser();
   $("#methodcontainer").svg({onLoad: (o) => {
     svg = o;
+    $("svg").remove();
   }});
 
   //big button clicks
@@ -119,6 +122,7 @@ $(function() {
   $("#collectionpanel").on("click", ".remove", removecollmethod);
   $("#savecolledits").on("click", savecolledits);
   $('input[name="sort"]').on("change", changecollsort);
+  $("#toggleview").on("click", togglecollview);
   
 });
 
@@ -781,12 +785,16 @@ function cancelemptycoll() {
 
 function viewcoll(cid) {
   currentscreen = "collectionpanel";
-  let cmethods = cid === "all-my-methods" ? mymethods : mymethods.filter(m => m.collections.includes(cid));
-  currentcollection = cid === "all-my-methods" ? allmymethods : mycollections.find(c => c.id === cid);
+  $("#gridcontainer").hide();
+  $("#collectionpanel table").show();
+  let all = cid === "all-my-methods";
+  let cmethods = all ? mymethods : mymethods.filter(m => m.collections.includes(cid));
+  currentcollection = all ? allmymethods : mycollections.find(c => c.id === cid);
   currentthing = currentcollection;
   sortby = currentcollection.sort || "title";
   $(`#collsort input[value="${sortby}"]`).prop("checked", true);
   cmethods.sort(sortmethods);
+  if (all) $("#toggleview").hide();
   
   $("#collectionpanel h3").text(currentcollection.title);
   $("#titleedit").val(currentcollection.title);
@@ -803,10 +811,36 @@ function viewcoll(cid) {
   changescreen();
 }
 
+
+function togglecollview() {
+  let prev = collview;
+  let text = collview === "grid" ? "View as grids" : "View as list";
+  $("#toggleview").text(text);
+  collview = prev === "grid" ? "list" : "grid";
+  if (collview === "grid") {
+    $("#editcollection,#collsort,#collectionpanel table").hide();
+    $("#gridcontainer").contents().remove();
+    let cmethods = mymethods.filter(m => m.collections.includes(cid));
+    let heights = [];
+    cmethods.forEach(m => {
+      let mobj = smallmethodobj[m.ccNum];
+      let rows = buildrowarr(mobj, "grid");
+      drawmethod(mobj, "grid", rows, true);
+      heights.push(Number($("svg:last-child").attr("height")));
+    });
+    console.log(heights);
+    $("#gridcontainer").show();
+  } else {
+    $("#gridcontainer").hide();
+    $("#editcollection,#collsort,#collectionpanel table").show();
+    
+  }
+}
+
 //start editing a collection
 function editcollection() {
   //editing = true;
-  $("#editcollection,#collsort,button.change").hide();
+  $("#editcollection,#collsort,button.change,#toggleview").hide();
   //can't change title of "All my methods"
   $("#titleedit").prop("disabled", currentcollection.id === "all-my-methods");
   $("#collectionpanel .edit").show();
@@ -854,7 +888,7 @@ function cancelcolledits() {
   editing = false;
   collectionedits = [];
   //viewcoll will hide the edit stuff but won't show currently hidden things
-  $("#editcollection,#collsort,button.change").show();
+  $("#editcollection,#collsort,button.change,#toggleview").show();
   viewcoll(currentcollection.id);
 }
 
@@ -1086,7 +1120,7 @@ function addmethodtocoll() {
 
 function bluebellchange() {
   bluebell = $("#bluebell").val();
-  drawmethod(methodobj);
+  drawmethod(methodobj, gridtype, rowarr);
 }
 
 //change method display
@@ -1101,8 +1135,8 @@ function toggledisplay() {
     h = "4em";
     $("#lineopts").hide();
   }
-  buildrowarr();
-  drawmethod(methodobj);
+  rowarr = buildrowarr(methodobj, gridtype);
+  drawmethod(methodobj, gridtype, rowarr);
   $("#displayoptions").css("height", h);
 }
 
@@ -1124,7 +1158,7 @@ function viewmethod(m, from) {
   let info = $("#methodinfobox ul");
   info.append(`<li>Place notation: ${mobj.pn}</li>`);
   
-  buildrowarr();
+  rowarr = buildrowarr(methodobj, gridtype);
   let lh = rowstring(rowarr[mobj.leadLength]);
   if (!mobj.huntBells) {
     mobj.huntBells = [];
@@ -1143,7 +1177,7 @@ function viewmethod(m, from) {
   $('#bluebell').val(bluebell);
   //console.log("drawing method??");
   //this function will take view prefs into account
-  drawmethod(mobj);
+  drawmethod(mobj, gridtype, rowarr);
   
   if (account) {
     currentmethod = mymethods.find(o => o.title === mobj.title);
@@ -1246,11 +1280,12 @@ function bluebellopts(stage) {
   return options;
 }
 
-//vars needed: stage, gridtype, rowarr
-//m needs to have: huntBells, leadLength
+//vars needed: 
+//m needs to have: huntBells, leadLength, stage
 //actually do I need m? wait currentmethod is for the object in my collection
-function drawmethod(m) {
-  $("svg").remove();
+function drawmethod(m, gridtype, rowarr, target) {
+  let topparent = target ? "#gridcontainer" : "#methodcontainer";
+  let stage = m.stage;
   let bells = [];
   let rounds = places.slice(0, stage).split("").map(bellnum);
   if (gridtype === "grid") {
@@ -1265,19 +1300,26 @@ function drawmethod(m) {
     }
   }
   let width = 40 + 16*stage;
-  let height = 20;
+  let height = target ? 40 : 20;
   height += 20*rowarr.length;
+  
     //gridtype === "grid" ? m.leadLength*20 : m.leadLength*m.leadsInCourse*20;
-  let grid = svg.svg($("#methodcontainer"), null, null, width, height, {class: "grid", xmlns: "http://www.w3.org/2000/svg", "xmlns:xlink": "http://www.w3.org/1999/xlink"});
+  let grid = svg.svg($(topparent), null, null, width, height, {class: "grid", xmlns: "http://www.w3.org/2000/svg", "xmlns:xlink": "http://www.w3.org/1999/xlink"});
   let boxgroup = svg.group(grid, {style: "fill: #eeeeee"});
   let numgroup = svg.group(grid, {style: "font-family: Arial; font-size: 14pt"});
   let huntgroup = svg.group(grid, {style: "stroke: red; stroke-width: 1; fill: none;"});
   let workgroup = svg.group(grid, {style: "stroke: blue; stroke-width: 2; fill: none;"});
   let workgreen = svg.group(grid, {style: "stroke: green; stroke-width: 2; fill: none;"});
   let linegroup = svg.group(grid, {style: "stroke: black; stroke-width: 1; fill: none;"});
-  
+
+  let topy = 10;
   //y increment between leadends
   let liney = m.leadLength*20;
+  if (target) {
+    topy += 20;
+    liney += 20;
+    svg.text(numgroup, width/2, 20, m.title, {style: "font-size: 12px; font-weight: bold; text-anchor: middle;"});
+  }
   let pbs = [];
   
   for (let b = 1; b <= stage; b++) {
@@ -1285,7 +1327,7 @@ function drawmethod(m) {
     let color;
     if (gridtype === "lines" && b%2 === 0) {
       let x = -6+16*(b-1);
-      svg.rect(boxgroup, x, 10, 16, height-40);
+      svg.rect(boxgroup, x, topy, 16, height-40);
     }
     let parent;
     if (m.huntBells && m.huntBells.includes(b)) {
@@ -1305,11 +1347,11 @@ function drawmethod(m) {
     }
     if (parent) {
       let pp = rowarr.map(r => r.indexOf(b)+1);
-      let path = buildsvgpath(pp);
+      let path = buildsvgpath(pp, topy);
       svg.path(parent, path);
       if (!hunt && gridtype === "lines") {
-        for (let y = 10; y < height; y += liney) {
-          let rownum = (y-10)/20;
+        for (let y = topy; y < height; y += liney) {
+          let rownum = (y-topy)/20;
           let p = rowarr[rownum].indexOf(b)
           let x = p*16+10;
           svg.circle(parent, x, y, 1);
@@ -1332,9 +1374,9 @@ function drawmethod(m) {
 
 //pp is array of place numbers
 //uses absolute starting points, may want to update...
-function buildsvgpath(pp) {
+function buildsvgpath(pp, topy) {
   let current = pp[0];
-  let path = ["M", -6+16*current, "10"].join(" ");
+  let path = ["M", -6+16*current, topy].join(" ");
   for (let i = 1; i < pp.length; i++) {
     let p = pp[i];
     if (p === current) {
@@ -1366,8 +1408,8 @@ function rowstring(arr) {
 }
 
 
-function buildrowarr() {
-  rowarr = [places.slice(0,stage).split("").map(bellnum)];
+function buildrowarr(methodobj, gridtype) {
+  let rowarr = [places.slice(0,methodobj.stage).split("").map(bellnum)];
   let lead = buildlead(methodobj.pnFull);
   rowarr.push(...lead);
   if (gridtype === "lines") {
@@ -1380,6 +1422,7 @@ function buildrowarr() {
       prev = rowarr[rowarr.length-1];
     }
   }
+  return rowarr;
 }
 
 //build first lead, starting with rounds

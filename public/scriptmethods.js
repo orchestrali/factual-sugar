@@ -231,7 +231,7 @@ function setupuser() {
 //
 function getmethods(stages) {
   let o = {
-    fields: "title stage class ccNum pn pnFull leadsInCourse leadHeadCode",
+    fields: "title stage class ccNum pn pnFull leadsInCourse leadHeadCode huntBells",
     stage: stages
   };
   //prevent stuff while searching
@@ -303,7 +303,7 @@ function tempcleanup() {
     });
     let obj = smallmethodobj[m.ccNum];
     if (obj) {
-      if (!obj.huntBells) {
+      if (!obj.huntBells || (!obj.huntBells.length && obj.class != "Principle")) {
         findhunts(obj);
       }
     } else if (!bigmethodobj) {

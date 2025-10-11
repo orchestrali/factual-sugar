@@ -59,6 +59,7 @@ var collview = "list";
 $(function() {
   $(".loadmethods,#overlay,#addmethods,.dialog").hide();
   if ($("body > h4").text().length === 0) $(".test").hide();
+  $("#loadingcontainer").show();
   setupuser();
   $("#methodcontainer").svg({onLoad: (o) => {
     svg = o;
@@ -148,6 +149,7 @@ function showloadmethods() {
   $("#loadingcontainer").append(`<div id="loadstages"><h3>Load methods</h3></div>`);
   
   $("#loadstages").append(opts);
+  
   $("#fetchmethods").on("click", loadmethodsclick);
   $("#cancelfetch").on("click", cancelmethodload);
 }

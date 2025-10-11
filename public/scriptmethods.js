@@ -845,9 +845,11 @@ function togglecollview() {
       let mobj = smallmethodobj[m.ccNum];
       let rows = buildrowarr(mobj, "grid");
       drawmethod(mobj, "grid", rows, true);
-      heights.push(Number($("svg:last-child").attr("height")));
+      heights.push(Number($("#gridcontainer svg:last-child").attr("height")));
     });
     console.log(heights);
+    let max = Math.max(...heights);
+    $("#gridcontainer svg").attr("height", max);
     $("#gridcontainer").show();
   } else {
     $("#gridcontainer").hide();
@@ -1338,8 +1340,10 @@ function drawmethod(m, gridtype, rowarr, target) {
   if (target) {
     //topy += 20;
     //liney += 20;
-    let x = 16*stage+20;
-    svg.text(numgroup, x, 10, m.title, {transform: "rotate(90 "+x.toString()+" 10)", style: "font-size: 12px; font-weight: bold;"});
+    let x = 16*stage+4;
+    let mtitle = svg.text(numgroup, x, 9, m.title, {transform: "rotate(90 "+x.toString()+" 9)", style: "font-size: 12px; font-weight: bold;"});
+    let length = Math.ceil($(mtitle).width());
+    if (length + 9 > height) $(grid).attr("height", length+12);
   }
   let pbs = [];
   

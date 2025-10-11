@@ -58,7 +58,7 @@ var collview = "list";
 
 $(function() {
   $(".loadmethods,#overlay,#addmethods,.dialog").hide();
-  console.log($("body > h4").text().length);
+  if ($("body > h4").text().length === 0) $(".test").hide();
   setupuser();
   $("#methodcontainer").svg({onLoad: (o) => {
     svg = o;
@@ -1319,7 +1319,7 @@ function drawmethod(m, gridtype, rowarr, target) {
   if (target) {
     topy += 20;
     liney += 20;
-    svg.text(numgroup, width/2, 20, m.title, {style: "font-size: 12px; font-weight: bold; text-anchor: middle;"});
+    svg.text(numgroup, 8*stage+10, 20, m.title, {style: "font-size: 12px; font-weight: bold; text-anchor: middle;"});
   }
   let pbs = [];
   

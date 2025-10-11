@@ -13,6 +13,10 @@ header {
   max-width: 700px;
 }
 
+h1 {
+  margin-bottom: 5px;
+}
+
 label {
   display: inline-block;
 }
@@ -96,8 +100,8 @@ div.screen {
 }
 
 #aboutbutton {
-  margin-left: auto;
-  margin-right: 15px;
+  margin-left: 15px;
+  margin-right: 25px;
   padding: 8px;
   background-color: rgb(239, 230, 250);
   border-radius: 5px;
@@ -123,7 +127,7 @@ div.screen {
 #loadingcontainer label {
   margin-right: 5px;
 }
-#loadstages, #temp {
+#loadstages, #temp, #about {
   padding: 5px;
 }
 

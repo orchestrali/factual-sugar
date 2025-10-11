@@ -59,7 +59,7 @@ var collview = "list";
 $(function() {
   $(".loadmethods,#overlay,#addmethods,.dialog").hide();
   if ($("body > h4").text().length === 0) $(".test").hide();
-  $("#loadingcontainer").show();
+  
   setupuser();
   $("#methodcontainer").svg({onLoad: (o) => {
     svg = o;
@@ -149,7 +149,7 @@ function showloadmethods() {
   $("#loadingcontainer").append(`<div id="loadstages"><h3>Load methods</h3></div>`);
   
   $("#loadstages").append(opts);
-  
+  $("#loadingcontainer").show();
   $("#fetchmethods").on("click", loadmethodsclick);
   $("#cancelfetch").on("click", cancelmethodload);
 }
@@ -165,7 +165,7 @@ function loadmethodsclick() {
 
 function cancelmethodload() {
   $("#loadstages").remove();
-  $("#overlay").hide();
+  $("#overlay,#loadingcontainer").hide();
 }
 
 //old function where I always started by fetching methods
@@ -211,6 +211,9 @@ function setupuser() {
     mymethods = JSON.parse(localStorage.getItem("mymethods"));
     
     mycollections = JSON.parse(localStorage.getItem("mycollections"));
+    if (localStorage.getItem("allmymethods")) {
+      allmymethods = JSON.parse(localStorage.getItem("allmymethods"));
+    }
     if (localStorage.getItem("smallmethodobj")) {
       smallmethodobj = JSON.parse(localStorage.getItem("smallmethodobj"));
     }
@@ -276,7 +279,7 @@ function getmethods(stages) {
     
     if (stagesloaded.length < 14) $(".loadmethods").show();
     $("#addmethods").show();
-    $("#overlay").hide();
+    $("#overlay,#loadingcontainer").hide();
   });
 }
 
@@ -315,8 +318,10 @@ function tempcleanup() {
     }
     //smallmethodobj[m.ccNum] = obj;
   });
-  if (mycollections.length && !mycollections[0].position) {
+  
+  if (mycollections.length && mycollections.find(o => !o.position)) {
     mycollections.forEach((c,i) => c.position = i+2);
+    allmymethods.position = 1;
   }
   if (needfetch) alert("Please load methods to fix gaps in your saved data");
   savelocal();
@@ -326,6 +331,7 @@ function savelocal() {
   localStorage.setItem("account", account);
   localStorage.setItem("mymethods", JSON.stringify(mymethods));
   localStorage.setItem("mycollections", JSON.stringify(mycollections));
+  localStorage.setItem("allmymethods", JSON.stringify(allmymethods));
   //this one might stay in local storage? or when retrieving user data, get detailed info about just the methods in their collections
   localStorage.setItem("smallmethodobj", JSON.stringify(smallmethodobj));
 }
@@ -783,10 +789,18 @@ function savenewcoll() {
   } else {
     let coll = {
       title: title,
-      id: "c"+Date.now()
+      id: "c"+Date.now(),
+      notes: [],
+      position: mycollections.length+2
     };
     mycollections.push(coll);
-    let row = `<tr id="${coll.id}"><td class="collection">${title}</td><td>0</td><td><button class="remove">-</button></td></tr>`;
+    let move = `<select class="cposition">`;
+    for (let i = 1; i <= mycollections.length+1; i++) {
+      let s = i === coll.position ? " selected" : "";
+      move += `<option${s}>${i}</option>`;
+    }
+    move += `</select>`;
+    let row = `<tr id="${coll.id}"><td class="collection">${title}</td><td class="count">0</td><td>${s}</td><td><button class="remove">-</button></td></tr>`;
     $("#collectionlist tbody").append(row);
     
     cancelemptycoll();
@@ -809,7 +823,7 @@ function viewcoll(cid) {
   collview = "list";
   $("#toggleview").text("View as grids");
   $("#gridcontainer").hide();
-  $("#editcollection,#collsort,#collectionpanel table").show();
+  $("#toggleview,#editcollection,#collsort,#collectionpanel table").show();
   let all = cid === "all-my-methods";
   let cmethods = all ? mymethods : mymethods.filter(m => m.collections.includes(cid));
   currentcollection = all ? allmymethods : mycollections.find(c => c.id === cid);

@@ -63,7 +63,6 @@ $(function() {
   setupuser();
   $("#methodcontainer").svg({onLoad: (o) => {
     svg = o;
-    
   }});
 
   //big button clicks
@@ -80,14 +79,15 @@ $(function() {
   $("#addmethods").on("click", searchmethods);
   $("#methodclass,#methodstage").on("change", buildmethodlist);
   $("#methodsearch").on("keyup", methodkeyup);
-  $("#methodnamelist").on("click", "li", (e) => {
+  $("#methodnamelist").on("click", "li", (e) => { 
     $("li.selected").removeClass("selected");
     $(e.currentTarget).addClass("selected");
     $("#addingdiv").addClass("hidden");
     $("#methodbuttons").show();
+    scrollelem("methodbuttons");
   });
   $("#viewmethod").on("click", viewfromsearch);
-  $("#addmethod").on("click", choosecollfromsearch);
+  $("#addmethod").on("click", choosecollfromsearch); 
   $("#saveadd").on("click", addmethodfromsearch);
 
   //method functions
@@ -99,9 +99,9 @@ $(function() {
   $("#savemethod").on("click", addmethodtocoll);
 
   //note functions
-  $("#addnote").on("click", editnote);
+  $("#addnote").on("click", editnote); 
   $("#savenote").on("click", savenote);
-  $("#noteslist").on("click", "li", viewnoteclick);
+  $("#noteslist").on("click", "li", viewnoteclick); 
   $("#noteback").on("click", backfromnote);
   $("#editnote").on("click", editnote);
   $("#cancelnote").on("click", canceleditnote);
@@ -111,10 +111,10 @@ $(function() {
   //collection list functions
   $("#collectionlist").on("click", "td.collection", collclick);
   $("#colltitle,#titleedit").on("keyup", colltitlekeyup);
-  $("#newcollection").on("click", addemptycoll);
+  $("#newcollection").on("click", addemptycoll); 
   $("#cancelnewcoll").on("click", cancelemptycoll);
   $("#savecoll").on("click", savenewcoll);
-  $("#collectionlist").on("click", ".remove", clickdelete); //not functional yet
+  $("#collectionlist").on("click", ".remove", clickdelete); 
   $("#collectionlist").on("change", ".cposition", movecoll);
   $("#collectionlist").on("click", ".movecoll", bumpcoll);
   $("#collectionlist").on("click", ".cancelcollmove", cancelcollmove);
@@ -159,7 +159,7 @@ function loadmethodsclick() {
   let stages = [];
   $("input.stage:checked").each((i,e) => stages.push($(e).val()));
   $("#loadstages").remove();
-  $("#loadingcontainer").append(`<p id="temp">Loading methods...</p>`);
+  $("#loadingcontainer").append(`<p id="temp"><img src="/images/wait.gif" alt="spinning circle" />Loading methods...</p>`);
 
   getmethods(stages.join(";"));
 }
@@ -237,7 +237,24 @@ function getmethods(stages) {
   //prevent stuff while searching
   //doing this with the overlay
 
-  $.post("/find/method", o, (mm) => {
+  $.post({
+    url: "/find/method",
+    data: o,
+    timeout: 30000,
+    success: loadsuccess,
+    error: function(jqxhr, textstatus) {
+      console.log(textstatus);
+      let html = `<p>Problem loading methods. Try again later!</p>
+      <button id="closeload">Close</button>`;
+      $("#loadingcontainer").html(html);
+      $("#closeload").on("click", () => {
+        $("#loadingcontainer").contents().remove();
+        $("#overlay,#loadingcontainer").hide();
+      });
+    }
+  });
+
+  function loadsuccess(mm) {
     console.log("methods retrieved");
     if (stagesloaded.length === 0) {
       bigmethodobj = {};
@@ -281,7 +298,7 @@ function getmethods(stages) {
     if (stagesloaded.length < 14) $(".loadmethods").show();
     $("#addmethods").show();
     $("#overlay,#loadingcontainer").hide();
-  });
+  }
 }
 
 //changes to how localstorage items need to be structured
@@ -474,6 +491,10 @@ function confirmdelete() {
   $("#overlay,#deletedialog").hide();
 }
 
+function scrollelem(id) {
+  document.getElementById(id).scrollIntoView();
+}
+
 
 
 
@@ -634,6 +655,7 @@ function choosecollfromsearch() {
   }).join("");
   $("#colllist").html(html);
   $("#addingdiv").removeClass("hidden");
+  scrollelem("methodbuttons");
 }
 
 //save a method to a collection
@@ -780,6 +802,7 @@ function removecoll() {
 function addemptycoll() {
   $("#newcollection").hide();
   $("#newcollpanel").removeClass("hidden");
+  scrollelem("newcollpanel");
 }
 
 function savenewcoll() {
@@ -1001,6 +1024,7 @@ function viewnote(note) {
   currentnote = note;
   $(".notescreen").hide();
   $("#noteviewer").show();
+  scrollelem("notepanel");
 }
 
 function backfromnote() {
@@ -1030,6 +1054,7 @@ function editnote() {
   $("#note").val(text);
   $(".notescreen").hide();
   $("#noteeditor").show();
+  scrollelem("notepanel");
 }
 
 //needs to handle edits AND new notes

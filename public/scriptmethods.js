@@ -303,9 +303,9 @@ function tempcleanup() {
     });
     let obj = smallmethodobj[m.ccNum];
     if (obj) {
-      if (!obj.huntBells || (!obj.huntBells.length && obj.class != "Principle")) {
+      //if (!obj.huntBells || (!obj.huntBells.length && obj.class != "Principle")) {
         findhunts(obj);
-      }
+      //}
     } else if (!bigmethodobj) {
       needfetch = true;
     } else {

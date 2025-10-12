@@ -1455,7 +1455,7 @@ function rowstring(arr) {
 }
 
 function findhunts(mobj) {
-  let lead = buildlead(mobj.pnFull);
+  let lead = buildlead(mobj.pnFull, mobj.stage);
   let lh = rowstring(lead[lead.length-1]);
   mobj.huntBells = [];
   for (let i = 0; i < mobj.stage; i++) {
@@ -1466,7 +1466,7 @@ function findhunts(mobj) {
 
 function buildrowarr(methodobj, gridtype) {
   let rowarr = [places.slice(0,methodobj.stage).split("").map(bellnum)];
-  let lead = buildlead(methodobj.pnFull);
+  let lead = buildlead(methodobj.pnFull, methodobj.stage);
   rowarr.push(...lead);
   if (gridtype === "lines") {
     let leads = 1;
@@ -1483,8 +1483,8 @@ function buildrowarr(methodobj, gridtype) {
 
 //build first lead, starting with rounds
 //global stage variable needs to be set!
-function buildlead(pn) {
-  let row = places.slice(0,stage).split("").map(bellnum);
+function buildlead(pn, pnstage) {
+  let row = places.slice(0,pnstage).split("").map(bellnum);
   return buildrows(row, pn);
 }
 

@@ -48,10 +48,10 @@ td {
   max-width: 400px;
 }
 
-td:first-child {
+td.collection, td.method {
   color: navy;
 }
-td:first-child:hover {
+td.collection:hover, td.method:hover {
   cursor: pointer;
   text-decoration: underline;
 }
@@ -82,11 +82,12 @@ td:first-child:hover {
 }
 
 .dialog {
-  position: fixed;
+  position: relative;
   width: 90%;
   max-width: 700px;
   z-index: 20;
   background-color: white;
+  padding: 8px;
 }
 
 .notescreen {
@@ -125,11 +126,9 @@ div.screen {
 
 
 #loadingcontainer label {
-  margin-right: 5px;
+  margin-right: 12px;
 }
-#loadstages, #temp, #about {
-  padding: 5px;
-}
+
 
 #addmethodscreen, #collectionpanel, #methodpanel {
   display: none;
@@ -199,11 +198,14 @@ div.screen {
   display: none;
 }
 
-#methodnoteslist li:hover {
+#noteslist li:hover {
   cursor: pointer;
 }
 
-
+#spacer {
+  width: 10px;
+  height: 40px;
+}
 
 
 

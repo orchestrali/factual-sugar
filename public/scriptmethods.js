@@ -1326,6 +1326,7 @@ function bluebellopts(stage) {
 function drawmethod(m, gridtype, rowarr, target) {
   $("#methodcontainer svg").remove();
   let topparent = target ? "#gridcontainer" : "#methodcontainer";
+  findhunts(m); //something's going wrong so just make sure
   let stage = m.stage;
   let bells = [];
   let rounds = places.slice(0, stage).split("").map(bellnum);

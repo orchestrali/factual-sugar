@@ -99,7 +99,7 @@ fastify.post("/delete", function(request, reply) {
 });
 
 fastify.get("/methods", function(request, reply) {
-  reply.view("/src/pages/methods.html");
+  reply.view("/src/pages/methodsearch.html");
 });
 
 fastify.get("/find/:model", async function(req, reply) {

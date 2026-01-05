@@ -30,7 +30,7 @@ sorttable = {
     if (!document.createElement || !document.getElementsByTagName) return;
     
     sorttable.DATE_RE = /^(\d\d?)[\/\.-](\d\d?)[\/\.-]((\d\d)?\d\d)$/;
-    
+    console.log("starting table sort function");
     forEach(document.getElementsByTagName('table'), function(table) {
       if (table.className.search(/\bsortable\b/) != -1 && table.rows.length > 0) {
         sorttable.makeSortable(table);
@@ -366,7 +366,7 @@ if (/WebKit/i.test(navigator.userAgent)) { // sniff
 }
 
 /* for other browsers */
-window.onload = sorttable.init;
+//window.onload = sorttable.init;
 
 // written by Dean Edwards, 2005
 // with input from Tino Zijdel, Matthias Miller, Diego Perini

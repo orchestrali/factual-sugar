@@ -92,7 +92,7 @@ function router() {
   let query = buildquery();
   queryobj = query;
   console.log(query);
-  $("#container").contents().remove();
+  $("#container,#results tbody,#results thead").contents().remove();
   if (query.fields.length) {
     $("#container").append("loading...");
     sendsearch(query);
@@ -340,7 +340,8 @@ function buildtable(res) {
   let es = res.length > 1 ? "" : "es";
   $("#container").append(`<p>${res.length} method${s} match${es}</p>`);
   let cols = queryobj.fields.split(" ");
-  let table = `<table id="results" class="sortable"><thead><th>`+cols.join("</th><th>")+"</th></thead><tbody>";
+  $("#results thead").append(`<tr><th>${cols.join("</th><th>")}</th></tr>`);
+  let table = ``;
   res.forEach(o => {
     table += `<tr>`;
     cols.forEach(k => {
@@ -357,8 +358,7 @@ function buildtable(res) {
     });
     table += `</tr>`;
   });
-  table += `</tbody></table>`;
-  $("#container").append(table);
+  $("#results tbody").append(table);
 }
 
 function formatinfo(field, val) {

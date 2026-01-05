@@ -350,6 +350,7 @@ function handleresults(res) {
       searchresultsstring += `
 `;
     }
+    sorttable.init;
   } else {
     console.log(res);
   }

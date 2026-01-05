@@ -5,6 +5,7 @@ const leadheads = ["Plain Bob", "Grandsire", "other"];
 
 var numsearchrows = 1;
 var queryobj;
+var searchresultsstring;
 
 $(function() {
   $("#search").on("change", ".field", searchfieldchange);
@@ -326,9 +327,29 @@ function sendsearch(query) {
 
 function handleresults(res) {
   console.log("loaded!");
+  //doing this again to remove text "loading"
   $("#container").contents().remove();
   if (res.length) {
+    let s = res.length > 1 ? "s" : "";
+    let es = res.length > 1 ? "" : "es";
+    $("#container").append(`<p>${res.length} method${s} match${es}</p>`);
+    let cols = queryobj.fields.split(" ").length;
+    searchresultsstring = queryobj.fields.split(" ").join(",");
+    searchresultsstring += `
+    `;
     buildtable(res);
+    for (let i = 1; i <= res.length; i++) {
+      let tr = $("#results tbody tr:nth-child("+i+")");
+      let row = [];
+      for (let j = 1; j <= cols; j++) {
+        let str = tr.children("td:nth-child("+j+")").text() || "";
+        if (str.includes(",")) str = '"'+str+'"';
+        row.push(str);
+      }
+      searchresultsstring += row.join(",");
+      searchresultsstring += `
+      `;
+    }
   } else {
     console.log(res);
   }
@@ -336,9 +357,7 @@ function handleresults(res) {
 
 var differentfields = ["classification", "huntBells", "stationaryBells", "symmetry", "huntPath", "pbOrder"];
 function buildtable(res) {
-  let s = res.length > 1 ? "s" : "";
-  let es = res.length > 1 ? "" : "es";
-  $("#container").append(`<p>${res.length} method${s} match${es}</p>`);
+  
   let cols = queryobj.fields.split(" ");
   $("#results thead tr").append(`<th>${cols.join("</th><th>")}</th>`);
   let table = ``;

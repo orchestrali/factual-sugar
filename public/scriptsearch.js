@@ -336,7 +336,7 @@ function handleresults(res) {
     let cols = queryobj.fields.split(" ").length;
     searchresultsstring = queryobj.fields.split(" ").join(",");
     searchresultsstring += `
-    `;
+`;
     buildtable(res);
     for (let i = 1; i <= res.length; i++) {
       let tr = $("#results tbody tr:nth-child("+i+")");
@@ -348,7 +348,7 @@ function handleresults(res) {
       }
       searchresultsstring += row.join(",");
       searchresultsstring += `
-      `;
+`;
     }
   } else {
     console.log(res);

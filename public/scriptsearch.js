@@ -92,7 +92,7 @@ function router() {
   let query = buildquery();
   queryobj = query;
   console.log(query);
-  $("#container,#results tbody,#results thead").contents().remove();
+  $("#container,#results tbody,#results thead tr").contents().remove();
   if (query.fields.length) {
     $("#container").append("loading...");
     sendsearch(query);
@@ -340,7 +340,7 @@ function buildtable(res) {
   let es = res.length > 1 ? "" : "es";
   $("#container").append(`<p>${res.length} method${s} match${es}</p>`);
   let cols = queryobj.fields.split(" ");
-  $("#results thead").append(`<tr><th>${cols.join("</th><th>")}</th></tr>`);
+  $("#results thead tr").append(`<th>${cols.join("</th><th>")}</th>`);
   let table = ``;
   res.forEach(o => {
     table += `<tr>`;

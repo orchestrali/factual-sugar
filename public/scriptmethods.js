@@ -109,6 +109,7 @@ $(function() {
   $("#deletenote").on("click", clickdelete);
 
   //collection list functions
+  $("#download").on("click", downloadnotes);
   $("#collectionlist").on("click", "td.collection", collclick);
   $("#colltitle,#titleedit").on("keyup", colltitlekeyup);
   $("#newcollection").on("click", addemptycoll); 
@@ -633,7 +634,7 @@ function respell(name) {
   return alt;
 }
 
-//[todo]
+//
 function addmethodfromsearch() {
   let mid = $("#methodnamelist li.selected").attr("id");
   let cid = $("#colllist").val();
@@ -701,6 +702,71 @@ function savemethod(mid, cid) {
 
 
 // ***** collection list functions *****
+
+//download collections + method notes as text file
+function downloadnotes() {
+  let file = buildtextfile();
+  const a = document.createElement('a');
+  const blob = new Blob([file], {type: "text/plain"});
+  a.href = URL.createObjectURL(blob);
+  a.download = "my-method-notes.txt";
+  a.click();
+  
+  URL.revokeObjectURL(a.href);
+}
+
+//text version for download
+function buildtextfile() {
+  let text = `COLLECTIONS
+
+`;
+  
+  mycollections.forEach(coll => {
+    text += coll.title + `
+    `;
+    let mm = mymethods.filter(m => m.collections.includes(coll.id));
+    sortby = coll.sort || "title";
+    mm.sort(sortmethods);
+    mm.forEach(m => {
+      text += m.title + `
+    `;
+    });
+    
+    text += `
+`;
+    if (coll.notes) {
+      coll.notes.forEach(note => {
+        text += `NOTE: ${note.title}
+${note.contents}
+*********
+
+`;
+      });
+    }
+  });
+  
+  text += `~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+METHODS
+
+`;
+  mymethods.forEach(m => {
+    text += m.title + `
+
+`;
+    m.notes.forEach(note => {
+      text += `NOTE: ${note.title}
+${note.contents}
+
+`;
+    });
+    text += `*********
+`;
+  });
+  
+  return text;
+}
+
 
 //saving collection sort in mycollections
 //editing "All my methods" will prompt rebuild

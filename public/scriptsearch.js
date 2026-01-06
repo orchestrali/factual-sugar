@@ -13,6 +13,8 @@ $(function() {
   $("#search").on("click", ".remove", removesearchrow);
   
   $("#submit").on("click", router);
+
+  $("table.sortable").on("click", "th", tableheadclick);
 });
 
 
@@ -350,7 +352,7 @@ function handleresults(res) {
       searchresultsstring += `
 `;
     }
-    sorttable.init;
+    
   } else {
     console.log(res);
   }

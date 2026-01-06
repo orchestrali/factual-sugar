@@ -26,7 +26,8 @@ var mymethods;
 //collections are just title and id
 //adding: position (in list of collections), sort (within collection), notes
 var mycollections;
-
+//the last collection chosen to be added to
+var lastchosen;
 //possible: collectionlist, collectionpanel, methodpanel, addmethodscreen
 var currentscreen = "collectionlist";
 //method object from mymethods
@@ -652,7 +653,8 @@ function choosecollfromsearch() {
   let mid = $("#methodnamelist li.selected").attr("id");
   let colls = availablecolls(mid);
   let html = colls.map(c => {
-    return `<option value="${c.id}">${c.title}</option>`;
+    let s = lastchosen === c.id ? " selected" : "";
+    return `<option value="${c.id}"${s}>${c.title}</option>`;
   }).join("");
   $("#colllist").html(html);
   $("#addingdiv").removeClass("hidden");
@@ -663,7 +665,8 @@ function choosecollfromsearch() {
 //mid: ccnum, cid: existing collection number
 function savemethod(mid, cid) {
   console.log("saving method");
-  console.log(mid, cid);
+  //console.log(mid, cid);
+  lastchosen = cid;
   let mym = mymethods.find(o => o.ccNum === mid);
   let o;
   let trs = [cid];

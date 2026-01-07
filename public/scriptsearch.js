@@ -15,6 +15,7 @@ $(function() {
   
   $("#submit").on("click", router);
 
+  $("#container").on("click", "#download", downloadresults);
   $("table.sortable").on("click", "th", tableheadclick);
 });
 
@@ -23,6 +24,7 @@ NOTES
 - display of pnFull is not right
 - distinguish whether stage&pnFull are added only for plain course search
 - need to figure out how to display matches in the plain course
+I think I've addressed all of the above
 */
 
 
@@ -105,7 +107,10 @@ function searchfieldchange(e) {
 function router() {
   plaincoursesearch = false;
   let query = buildquery();
-  queryobj = query;
+  queryobj = {};
+  for (let key in query) {
+    queryobj[key] = query[key];
+  }
   console.log(query);
   $("#container,#results tbody,#results thead tr").contents().remove();
   if (query.fields.length) {
@@ -254,38 +259,43 @@ function handleresults(res) {
   $("#container").contents().remove();
   if (res.length) {
     //what if no methods match??
+    //oh it'll just say 0
     //run filter here for plain course searches
     if (plaincoursesearch) {
       res = res.filter(checkmethodplaincourse);
       if (res.length) console.log(res[0]);
+      queryobj.fields += " rowMatches";
     }
-    let s = res.length > 1 ? "s" : "";
-    let es = res.length > 1 ? "" : "es";
+    let s = res.length === 1 ? "" : "s";
+    let es = res.length === 1 ? "es" : "";
     $("#container").append(`<p>${res.length} method${s} match${es}</p>`);
-    let cols = queryobj.fields.split(" ").length;
-    searchresultsstring = queryobj.fields.split(" ").join(",");
-    searchresultsstring += `
-`;
-    buildtable(res);
-    for (let i = 1; i <= res.length; i++) {
-      let tr = $("#results tbody tr:nth-child("+i+")");
-      let row = [];
-      for (let j = 1; j <= cols; j++) {
-        let str = tr.children("td:nth-child("+j+")").text() || "";
-        if (str.includes(",")) str = '"'+str+'"';
-        row.push(str);
-      }
-      searchresultsstring += row.join(",");
+    if (res.length) {
+      $("#container").append(`<button type="button" id="download">Download results as csv</button>`);
+      let cols = queryobj.fields.split(" ").length;
+      searchresultsstring = queryobj.fields.split(" ").join(",");
       searchresultsstring += `
 `;
+      buildtable(res);
+      for (let i = 1; i <= res.length; i++) {
+        let tr = $("#results tbody tr:nth-child("+i+")");
+        let row = [];
+        for (let j = 1; j <= cols; j++) {
+          let str = tr.children("td:nth-child("+j+")").text() || "";
+          str = str.replace(/"/g, '\"');
+          if (str.includes(",")) str = '"'+str+'"';
+          row.push(str);
+        }
+        searchresultsstring += row.join(",");
+        searchresultsstring += `
+`;
+      }
     }
-    
   } else {
     console.log(res);
   }
 }
 
-var differentfields = ["classification", "huntBells", "stationaryBells", "symmetry", "huntPath", "pbOrder"];
+var differentfields = ["classification", "huntBells", "stationaryBells", "symmetry", "huntPath", "pbOrder", "pnFull"];
 function buildtable(res) {
   
   let cols = queryobj.fields.split(" ");
@@ -300,6 +310,12 @@ function buildtable(res) {
         s = `<a href="${url}" target="blank">${o[k]}</a>`;
       } else if (differentfields.includes(k)) {
         s = formatinfo(k, o[k]);
+      } else if (k === "rowMatches") {
+        let arr = [];
+        o.matches.forEach(m => {
+          arr.push(m.row + " (row "+m.number+")");
+        });
+        s = arr.join(", ");
       } else if (o[k]) {
         s = o[k];
       }
@@ -336,8 +352,21 @@ function formatinfo(field, val) {
         });
       }
       break;
+    case "pnFull":
+      string = JSON.stringify(val);
+      break;
   }
   return string;
+}
+
+function downloadresults() {
+  const a = document.createElement('a');
+  const blob = new Blob([searchresultsstring], {type: "text/plain"});
+  a.href = URL.createObjectURL(blob);
+  a.download = "method-search-results.csv";
+  a.click();
+
+  URL.revokeObjectURL(a.href);
 }
 
 

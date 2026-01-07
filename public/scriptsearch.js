@@ -27,7 +27,7 @@ function addsearchrow() {
   <label for="field${rownum}">Search field:</label>
   <select id="field${rownum}" class="field">
     <option></option>`;
-  let fields = ["Stage", "Class", "Name", "Symmetry", "Leadlength", "Place notation", "Leadheads"];
+  let fields = ["Stage", "Class", "Name", "Symmetry", "Leadlength", "Place notation", "Leadheads", "Row in plain course"];
   fields.forEach(f => {
     row += `
     <option>${f}</option>`;

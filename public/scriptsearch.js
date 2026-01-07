@@ -5,6 +5,7 @@ const leadheads = ["Plain Bob", "Grandsire", "other"];
 
 var numsearchrows = 1;
 var queryobj;
+var plaincoursesearch;
 var searchresultsstring;
 
 $(function() {
@@ -82,6 +83,10 @@ function searchfieldchange(e) {
     case "Leadlength":
       let lid = "row"+r+"leadlength";
       html += `<label for="${lid}"><input type="number" id="${lid}" class="leadlength" /></label>`;
+      break;
+    case "Row in plain course":
+      let rid = "row"+r+"bellrow";
+      html += `<label for="${rid}">row or segment in plain course: <input type="text" id="${rid}" class="bellrowsearch" /></label>`;
   }
   
   $("#row"+r+" span").append(html);
@@ -92,11 +97,17 @@ function searchfieldchange(e) {
 // *** submit ***
 
 function router() {
+  plaincoursesearch = false;
   let query = buildquery();
   queryobj = query;
   console.log(query);
   $("#container,#results tbody,#results thead tr").contents().remove();
   if (query.fields.length) {
+    if (plaincoursesearch) {
+      ["stage","pnFull"].forEach(w => {
+        if (!query.fields.includes(w)) query.fields += " "+w;
+      });
+    }
     $("#container").append("loading...");
     sendsearch(query);
   } else {
@@ -111,6 +122,7 @@ function buildquery() {
   });
   let q = buildsearchplain();
   
+  
   let query = {fields: fields.join(" ")};
   for (let key in q) {
     let v = q[key];
@@ -119,7 +131,7 @@ function buildquery() {
   return query;
 }
 
-const fields = ["stage", "class", "name", "pn", "leadlength", "symmetry", "leadheads"];
+const fields = ["stage", "class", "name", "pn", "leadlength", "symmetry", "leadheads", "bellrow"];
 function buildsearchplain() {
   let query = {};
   let arrays = {};
@@ -181,6 +193,18 @@ function buildsearchplain() {
           query.leadheads = checked;
         }
         break;
+      case "bellrow":
+        let strs = [];
+        $(".bellrowsearch").each((i,e) => {
+          let v = $(e).val();
+          if (v.length) {
+            let a = v.split("");
+            if (a.every(c => places.includes(c) || c === "x")) strs.push(v);
+          }
+        });
+        if (strs.length) {
+          plaincoursesearch = strs;
+        }
     }
   });
   
@@ -194,116 +218,7 @@ function buildsearchplain() {
   return query;
 }
 
-function buildsearch() {
-  let query = {};
-  let arrays = {};
-  fields.forEach(field => {
-    let vals;
-    
-    switch (field) {
-      case "stage":
-        vals = [];
-        $("input.stage").each((i,e) => {
-          if ($(e).is(":checked")) {
-            let v = Number($(e).val());
-            vals.push(v);
-          }
-        });
-        arrays.stage = vals;
-        break;
-      case "class": case "symmetry":
-        vals = [];
-        $("input."+field).each((i,e) => {
-          if ($(e).is(":checked")) {
-            let v = $(e).val();
-            //console.log(v);
-            vals.push(v);
-          }
-        });
-        arrays[field] = vals;
-        break;
-      case "name":
-        if ($(".name").length > 1) {
-          //multiple name searches
-        } else if ($(".name").length) {
-          let val = $(".name").val();
-          if (val.startsWith("/") && val.endsWith("/")) {
-            let regex = val.slice(1,-1);
-            query.name = {"$regex": regex};
-          } else if (val.length) {
-            query.name = val;
-          }
-        }
-        break;
-      case "pn":
-        if ($(".pn").length > 1) {
-          
-        } else if ($(".pn").length) {
-          let pn = $(".pn").val();
-          if (pn.length) {
-            
-            query.pn = {"$regex": pn};
-          }
-        }
-        
-        break;
-      case "leadlength":
-        vals = [];
-        $(".leadlength").each((i,e) => {
-          let v = Number($(e).val());
-          if (v) {
-            vals.push(v);
-          }
-        });
-        
-        if (vals.length) {
-          arrays.leadLength = vals;
-        }
-        break;
-      case "leadheads":
-        let checked = [];
-        $(".leadheads").each((i,e) => {
-          if ($(e).is(":checked")) {
-            let v = $(e).val();
-            if (!checked.includes(v)) checked.push(v);
-          }
-        });
-        if (checked.length === 1) {
-          let v = checked[0];
-          switch (v) {
-            case "plainbob":
-              query.leadHeadCode = {$exists: true};
-              query.huntBells = [1];
-              break;
-            case "grandsire":
-              query.leadHeadCode = {$exists: true};
-              query.huntBells = [1,2];
-              break;
-            case "other":
-              query.leadHeadCode = {$exists: false};
-              break;
-          }
-        } else if (checked.length === 2) {
-          if (checked.includes("other")) {
-            //$or needed, it's complicated
-          } else {
-            query.leadHeadCode = {$exists: true};
-          }
-        }
-        break;
-    }
-    
-    
-  });
-  for (let key in arrays) {
-    if (arrays[key].length === 1) {
-      query[key] = arrays[key][0];
-    } else if (arrays[key].length > 1) {
-      query[key] = {$in: arrays[key]};
-    }
-  }
-  return query;
-}
+
 
 function sendsearch(query) {
   $.post({
@@ -332,6 +247,12 @@ function handleresults(res) {
   //doing this again to remove text "loading"
   $("#container").contents().remove();
   if (res.length) {
+    //what if no methods match??
+    //run filter here for plain course searches
+    if (plaincoursesearch) {
+      res = res.filter(checkmethodplaincourse);
+      if (res.length) console.log(res[0]);
+    }
     let s = res.length > 1 ? "s" : "";
     let es = res.length > 1 ? "" : "es";
     $("#container").append(`<p>${res.length} method${s} match${es}</p>`);
@@ -412,3 +333,89 @@ function formatinfo(field, val) {
   }
   return string;
 }
+
+
+
+// ******** functions for plain courses ********
+
+//convert array of numbers to string
+function rowstring(r) {
+  return r.map(n => places[n-1]).join("");
+}
+
+//convert character to its bell number
+function bellnum(c) {
+  return places.indexOf(c)+1;
+}
+
+//row is an array of numbers
+//pn is also an array, with numbers or empty
+function applypn(row, pn) {
+  let next = [];
+  let dir = 1;
+  for (let p = 1; p <= row.length; p++) {
+    if (pn.includes(p)) {
+      next.push(row[p-1]);
+    } else {
+      next.push(row[p-1+dir]);
+      dir*=-1;
+    }
+  }
+  return next;
+}
+
+function buildrows(start, pn) {
+  let rows = [];
+  let prev = start;
+  for (let i = 0; i < pn.length; i++) {
+    let next = applypn(prev, pn[i]);
+    rows.push(next);
+    prev = next;
+  }
+  return rows;
+}
+
+function buildcourse(pn, stage) {
+  let start = places.slice(0, stage).split("").map(bellnum);
+  let rows = [];
+  let last = start;
+  let laststr = rowstring(last);
+  do {
+    let lead = buildrows(last, pn);
+    rows.push(...lead);
+    last = rows[rows.length-1];
+    laststr = rowstring(last);
+  } while (!places.includes(laststr));
+
+  return rows;
+}
+
+
+function checkmethodplaincourse(m) {
+  let pn = m.pnFull.map(e => {return e === "x" ? [] : e});
+  let course = buildcourse(pn, m.stage);
+  let rows = course.map(r => rowstring(r));
+  let matches = [];
+  //will be an OR search if there are multiple patterns
+  plaincoursesearch.forEach(p => {
+    let mm = testpattern(rows, p);
+    mm.forEach(r => {
+      let o = {
+        row: r,
+        number: rows.indexOf(r)+1
+      };
+      matches.push(o);
+    });
+  });
+  if (matches.length) m.matches = matches;
+  return matches.length > 0;
+}
+
+function testpattern(rows, pattern) {
+  if (!pattern.includes("x")) {
+    return rows.filter(r => r.includes(pattern));
+  }
+  let test = new RegExp(pattern.replace(/x/g, "\w"));
+  return rows.filter(r => test.test(r));
+}
+

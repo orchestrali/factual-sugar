@@ -754,8 +754,17 @@ METHODS
 
 `;
   mymethods.forEach(m => {
+    let colls = m.collections.map(cid => {
+      let c = mycollections.find(o => o.id === cid);
+      return c.title;
+    });
     text += m.title + `
-
+`;
+    if (colls.length) {
+      text += `Collections: ${colls.join("; "}
+`;
+    }
+    text += `
 `;
     m.notes.forEach(note => {
       text += `NOTE: ${note.title}

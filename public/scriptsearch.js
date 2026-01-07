@@ -18,6 +18,12 @@ $(function() {
   $("table.sortable").on("click", "th", tableheadclick);
 });
 
+/*
+NOTES
+- display of pnFull is not right
+- distinguish whether stage&pnFull are added only for plain course search
+- need to figure out how to display matches in the plain course
+*/
 
 
 function addsearchrow() {

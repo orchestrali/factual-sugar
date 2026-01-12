@@ -450,7 +450,7 @@ function testpattern(rows, pattern) {
   if (!pattern.includes("x")) {
     return rows.filter(r => r.includes(pattern));
   }
-  let test = new RegExp(pattern.replace(/x/g, "\w"));
+  let test = new RegExp(pattern.replace(/x/g, "\\w"));
   return rows.filter(r => test.test(r));
 }
 

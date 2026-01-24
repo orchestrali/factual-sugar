@@ -7,6 +7,7 @@ var numsearchrows = 1;
 var queryobj;
 var plaincoursesearch;
 var searchresultsstring;
+var searchresults;
 
 $(function() {
   $("#search").on("change", ".field", searchfieldchange);
@@ -106,6 +107,8 @@ function searchfieldchange(e) {
 
 function router() {
   plaincoursesearch = false;
+  searchresults = [];
+  searchresultsstring = "";
   let query = buildquery();
   queryobj = {};
   for (let key in query) {
@@ -270,6 +273,7 @@ function handleresults(res) {
     let es = res.length === 1 ? "es" : "";
     $("#container").append(`<p>${res.length} method${s} match${es}</p>`);
     if (res.length) {
+      searchresults = res; //so I can do stuff in the console
       $("#container").append(`<button type="button" id="download">Download results as csv</button>`);
       let cols = queryobj.fields.split(" ").length;
       searchresultsstring = queryobj.fields.split(" ").join(",");

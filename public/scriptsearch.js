@@ -273,13 +273,18 @@ function handleresults(res) {
     let es = res.length === 1 ? "es" : "";
     $("#container").append(`<p>${res.length} method${s} match${es}</p>`);
     if (res.length) {
+      let first = res;
+      if (res.length > 1000) {
+        first = res.slice(0,1000);
+        $("#container").append(`<p>only 1000 shown</p>`);
+      }
       searchresults = res; //so I can do stuff in the console
       $("#container").append(`<button type="button" id="download">Download results as csv</button>`);
       let cols = queryobj.fields.split(" ").length;
       searchresultsstring = queryobj.fields.split(" ").join(",");
       searchresultsstring += `
 `;
-      buildtable(res);
+      buildtable(first);
       for (let i = 1; i <= res.length; i++) {
         let tr = $("#results tbody tr:nth-child("+i+")");
         let row = [];

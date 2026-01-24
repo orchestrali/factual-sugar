@@ -761,7 +761,7 @@ METHODS
     text += m.title + `
 `;
     if (colls.length) {
-      text += `Collections: ${colls.join("; "}
+      text += `Collections: ${colls.join("; ")}
 `;
     }
     text += `

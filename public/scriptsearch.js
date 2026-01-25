@@ -26,6 +26,12 @@ NOTES
 - distinguish whether stage&pnFull are added only for plain course search
 - need to figure out how to display matches in the plain course
 I think I've addressed all of the above
+
+- download raw json results
+- option not to display results at all
+- DONE indicate regex options
+
+- track search fields and prevent multiples of some???
 */
 
 
@@ -87,7 +93,8 @@ function searchfieldchange(e) {
     case "Name": case "Place notation":
       let c = field === "Name" ? "name" : "pn";
       let id = field === "Name" ? "name"+r : "pn"+r;
-      html += `<label for="${id}">search: <input type="text" id="${id}" class="${c}" /></label>`;
+      let info = field === "Name" ? "(queries beginning and ending with '/' will be interpreted as a regular expression)" : "(will be treated as a regular expression)";
+      html += `<label for="${id}">search: ${info}<input type="text" id="${id}" class="${c}" /></label>`;
       break;
     case "Leadlength":
       let lid = "row"+r+"leadlength";
@@ -266,7 +273,7 @@ function handleresults(res) {
     //run filter here for plain course searches
     if (plaincoursesearch) {
       res = res.filter(checkmethodplaincourse);
-      if (res.length) console.log(res[0]);
+      //if (res.length) console.log(res[0]);
       queryobj.fields += " rowMatches";
     }
     let s = res.length === 1 ? "" : "s";

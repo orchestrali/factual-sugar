@@ -1,6 +1,6 @@
 const numbers = ["stage", "leadLength", "numHunts", "huntBells", "huntPath", "stationaryBells", "numWorking", "pbOrder", "leadsInCourse", "ccNum"];
 const booleans = ["classification.little", "classification.differential", "classification.plain", "classification.trebleDodging", "leadtruth", "coursetruth"];
-const others = ["fields", "title", "oldtitle", "name", "class", "leadHead", "leadHeadCode", "fchGroups", "symmetry", "pn", "pnFull", "refs", "notes"];
+const others = ["title", "oldtitle", "name", "class", "leadHead", "leadHeadCode", "fchGroups", "symmetry", "pn", "pnFull", "refs", "notes"];
 
 //mongodb query sent via query params
 //is there a clever way to do this with models
@@ -30,7 +30,11 @@ module.exports = function buildquery(q) {
       query[key] = val;
     }
   }
-  return query;
+  if (q.fields) {
+    return {fields: q.fields, query: query};
+  } else {
+    return query;
+  }
 }
 
 function arrstringstonums(a) {

@@ -108,6 +108,7 @@ fastify.get("/find/:model", async function(req, reply) {
   reply.send(results);
 });
 
+//designed for use with my actual search page, request body is query? needs to have a key "fields"
 fastify.post("/find/:model", async function(req, reply) {
   //console.log(req.body);
   const results = await mongorouter(req.params.model, req.body);

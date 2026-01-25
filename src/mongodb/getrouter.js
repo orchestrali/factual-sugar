@@ -7,7 +7,8 @@ module.exports = async function router(model, req) {
     let o = {model: model+"s"};
     o.query = req ? buildquery(req) : {};
     console.log(o.query);
-    const results = await connectsearch("./find.js", o);
+    let path = o.query.fields ? "./findfields.js" : "./find.js";
+    const results = await connectsearch(path, o);
     console.log("num results: "+results.length);
     return results;
   } else {
